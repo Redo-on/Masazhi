@@ -1,0 +1,16 @@
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Application/bin/Debug/net8.0/MyApp.Application.deps.json
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Application/bin/Debug/net8.0/MyApp.Application.dll
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Application/bin/Debug/net8.0/MyApp.Application.pdb
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Application/bin/Debug/net8.0/MyApp.Domain.dll
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Application/bin/Debug/net8.0/MyApp.Domain.pdb
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Application/obj/Debug/net8.0/MyApp.Application.csproj.AssemblyReference.cache
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Application/obj/Debug/net8.0/MyApp.Application.GeneratedMSBuildEditorConfig.editorconfig
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Application/obj/Debug/net8.0/MyApp.Application.AssemblyInfoInputs.cache
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Application/obj/Debug/net8.0/MyApp.Application.AssemblyInfo.cs
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Application/obj/Debug/net8.0/MyApp.Application.csproj.CoreCompileInputs.cache
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Application/obj/Debug/net8.0/MyApp.Application.sourcelink.json
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Application/obj/Debug/net8.0/MyApp.Ap.B540CA8A.Up2Date
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Application/obj/Debug/net8.0/MyApp.Application.dll
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Application/obj/Debug/net8.0/refint/MyApp.Application.dll
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Application/obj/Debug/net8.0/MyApp.Application.pdb
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Application/obj/Debug/net8.0/ref/MyApp.Application.dll

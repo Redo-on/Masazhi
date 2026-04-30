@@ -1,0 +1,12 @@
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Domain/bin/Debug/net8.0/MyApp.Domain.deps.json
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Domain/bin/Debug/net8.0/MyApp.Domain.dll
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Domain/bin/Debug/net8.0/MyApp.Domain.pdb
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Domain/obj/Debug/net8.0/MyApp.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Domain/obj/Debug/net8.0/MyApp.Domain.AssemblyInfoInputs.cache
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Domain/obj/Debug/net8.0/MyApp.Domain.AssemblyInfo.cs
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Domain/obj/Debug/net8.0/MyApp.Domain.csproj.CoreCompileInputs.cache
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Domain/obj/Debug/net8.0/MyApp.Domain.sourcelink.json
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Domain/obj/Debug/net8.0/MyApp.Domain.dll
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Domain/obj/Debug/net8.0/refint/MyApp.Domain.dll
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Domain/obj/Debug/net8.0/MyApp.Domain.pdb
+/home/red/Documents/GitHub/Masazhi/backend/MyApp.Domain/obj/Debug/net8.0/ref/MyApp.Domain.dll
