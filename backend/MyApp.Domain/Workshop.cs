@@ -18,6 +18,6 @@ public class Workshop
 
     public double cmimi {get; set; }
 
-    public kapaciteti {get; set; } 
+    public int kapaciteti { get; set; }
 
 }
