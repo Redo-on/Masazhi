@@ -4,9 +4,9 @@ public class Workshop
 {
     public int workshop_id { get; set; }
 
-    public String titulli {get; set; }
+    public String titulli {get; set; } = string.Empty;
 
-    public String pershkrimi {get; set; }
+    public String pershkrimi {get; set; } = string.Empty;
 
     public int instruktor_id{get; set; }
 
