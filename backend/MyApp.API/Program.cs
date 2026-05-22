@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using MyApp.Infrastructure.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -7,15 +10,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowReact",
-        policy => policy
-            .WithOrigins("http://localhost:5173") // Standard Vite/React port
-            .AllowAnyHeader()
-            .AllowAnyMethod());
-});
+var connectionString = "Server=localhost;Database=YogaCenterDB;User=root;Password=your_mysql_password_here;";
 
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(
+        connectionString, 
+        ServerVersion.AutoDetect(connectionString),
+        b => b.MigrationsAssembly("MyApp.Infrastructure") // Tells EF to save migrations in Infrastructure
+    ));
 var app = builder.Build();
 
 
