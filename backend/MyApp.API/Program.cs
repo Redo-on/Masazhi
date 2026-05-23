@@ -1,34 +1,41 @@
 using Microsoft.EntityFrameworkCore;
+using MyApp.Application.Interfaces;
+using MyApp.Application.Services;
 using MyApp.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+// Database Configuration (MySQL)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+// Register Services
+builder.Services.AddScoped<IProduktetService, ProduktetService>();
+builder.Services.AddScoped<IShitjetProdukteveService, ShitjetProdukteveService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReact",
+        policy => policy
+            .WithOrigins("http://localhost:5173") // Standard Vite/React port
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
 
-var connectionString = "Server=localhost;Database=YogaCenterDB;User=root;Password=your_mysql_password_here;";
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(
-        connectionString, 
-        ServerVersion.AutoDetect(connectionString),
-        b => b.MigrationsAssembly("MyApp.Infrastructure") // Tells EF to save migrations in Infrastructure
-    ));
 var app = builder.Build();
-
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(); // This provides the /swagger interface
+    app.UseSwaggerUI();
 }
 
 app.UseCors("AllowReact");
-
 app.MapControllers();
-
 app.Run();

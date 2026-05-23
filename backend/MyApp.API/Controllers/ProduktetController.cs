@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MyApp.Application.Interfaces;
 using MyApp.Domain;
 
 namespace MyApp.API.Controllers;
@@ -7,23 +8,47 @@ namespace MyApp.API.Controllers;
 [Route("api/[controller]")]
 public class ProduktetController : ControllerBase
 {
-    [HttpGet]
-    public ActionResult<IEnumerable<Produktet>> GetProduktet()
+    private readonly IProduktetService _service;
+
+    public ProduktetController(IProduktetService service)
     {
-        return Ok(new List<Produktet>());
+        _service = service;
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<Produktet>>> GetProduktet()
+    {
+        var result = await _service.GetAllAsync();
+        return Ok(result);
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Produktet> GetProduktet(int id)
+    public async Task<ActionResult<Produktet>> GetProduktet(int id)
     {
-        // Placeholder - return null or a sample
-        return Ok(new Produktet { produkti_id = id, emri = "Sample Product" });
+        var result = await _service.GetByIdAsync(id);
+        if (result == null) return NotFound();
+        return Ok(result);
     }
 
     [HttpPost]
-    public ActionResult<Produktet> CreateProduktet(Produktet produktet)
+    public async Task<ActionResult<Produktet>> CreateProduktet(Produktet produktet)
     {
-        // Placeholder - just return the input
-        return CreatedAtAction(nameof(GetProduktet), new { id = produktet.produkti_id }, produktet);
+        var created = await _service.CreateAsync(produktet);
+        return CreatedAtAction(nameof(GetProduktet), new { id = created.produkti_id }, created);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateProduktet(int id, Produktet produktet)
+    {
+        if (id != produktet.produkti_id) return BadRequest("ID mismatch");
+        await _service.UpdateAsync(produktet);
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteProduktet(int id)
+    {
+        await _service.DeleteAsync(id);
+        return NoContent();
     }
 }
