@@ -5,7 +5,7 @@ namespace MyApp.Domain;
 public class Anetaresimet
 {
     [Key]
-    public int Id { get; set; }
+    public int anetaresimi_id { get; set; }
     public int anetar_id { get; set; } 
     public string lloji { get; set; } = string.Empty;
     public decimal cmimi { get; set; } // Financial precision
