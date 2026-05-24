@@ -1,8 +1,11 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace MyApp.Domain;
 
 public class Anetaresimet
 {
-    public int anetaresimi_id { get; set; }
+    [Key]
+    public int Id { get; set; }
     public int anetar_id { get; set; } 
     public string lloji { get; set; } = string.Empty;
     public decimal cmimi { get; set; } // Financial precision

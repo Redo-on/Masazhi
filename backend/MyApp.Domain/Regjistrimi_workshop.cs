@@ -1,8 +1,11 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace MyApp.Domain;
 
 public class Regjistrimi_Workshop
 {
 
+    [Key]
     public int rw_id {get; set; }
 
     public int workshop_id {get; set; }

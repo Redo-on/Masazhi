@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace MyApp.Domain;
 
 public class Workshop
 {
+    [Key]
     public int workshop_id { get; set; }
 
     public String titulli {get; set; } = string.Empty;

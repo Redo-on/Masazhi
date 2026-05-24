@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace MyApp.Domain;
 
 public class Anetaret
 {
+    [Key]
     public int anetar_id { get; set; } 
     public string emri { get; set; } = string.Empty;
     public string mbiemri { get; set; } = string.Empty;

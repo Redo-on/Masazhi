@@ -10,7 +10,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-var connectionString = "Server=localhost;Database=YogaCenterDB;User=root;Password=your_mysql_password_here;";
+
+var connectionString = "Server=localhost;Database=YogaCenterDB;User=root;Password=;";
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(

@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace MyApp.Domain;
 
 public class Produktet
 {
+    [Key]
     public int produkti_id { get; set; }
     public string emri { get; set; } = string.Empty;
     public string pershkrimi { get; set; } = string.Empty;

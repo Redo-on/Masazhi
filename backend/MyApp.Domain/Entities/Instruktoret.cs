@@ -1,7 +1,11 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace MyApp.Domain;
+
 
 public class Instruktoret
 {
+    [Key]
     public int instruktor_id { get; set; } // Primary Key
     public string emri { get; set; } = string.Empty;
     public string mbiemri { get; set; } = string.Empty;

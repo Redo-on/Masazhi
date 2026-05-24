@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace MyApp.Domain;
 
 public class Shitjet_Produkteve
 {
+    [Key]
     public int shitje_id { get; set; }
     public int anetar_id { get; set; }
     public int produkti_id { get; set; }
