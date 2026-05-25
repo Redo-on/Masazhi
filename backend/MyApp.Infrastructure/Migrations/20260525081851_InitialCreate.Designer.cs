@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyApp.Infrastructure.Data;
 
@@ -10,31 +11,34 @@ using MyApp.Infrastructure.Data;
 
 namespace MyApp.Infrastructure.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(AppDbContext))]
+    [Migration("20260525081851_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.27")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("MyApp.Domain.Anetaresimet", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("anetaresimi_id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("anetaresimi_id"));
 
                     b.Property<int>("anetar_id")
                         .HasColumnType("int");
 
                     b.Property<decimal>("cmimi")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("data_fillimit")
                         .HasColumnType("datetime(6)");
@@ -50,7 +54,9 @@ namespace MyApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.HasKey("Id");
+                    b.HasKey("anetaresimi_id");
+
+                    b.HasIndex("anetar_id");
 
                     b.ToTable("Anetaresimet");
                 });
@@ -142,7 +148,8 @@ namespace MyApp.Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<decimal>("tarifa_orare")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("telefoni")
                         .IsRequired()
@@ -155,42 +162,49 @@ namespace MyApp.Infrastructure.Migrations
 
             modelBuilder.Entity("MyApp.Domain.Klasat", b =>
                 {
-                    b.Property<int>("klasa_id")
+                    b.Property<int>("klase_id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("klasa_id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("klase_id"));
 
-                    b.Property<string>("emri_klases")
+                    b.Property<string>("emri")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("instruktor_id")
                         .HasColumnType("int");
 
-                    b.Property<int>("kapaciteti")
+                    b.Property<int>("kapaciteti_max")
                         .HasColumnType("int");
+
+                    b.Property<int>("kohezgjatja_min")
+                        .HasColumnType("int");
+
+                    b.Property<string>("lloji")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("niveli")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("pershkrimi")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("salla")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("klasa_id");
+                    b.HasKey("klase_id");
 
                     b.ToTable("Klasat");
                 });
 
             modelBuilder.Entity("MyApp.Domain.Orari", b =>
                 {
-                    b.Property<int>("orari_id")
+                    b.Property<int>("orar_id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("orari_id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("orar_id"));
 
                     b.Property<string>("dita_javes")
                         .IsRequired()
@@ -214,9 +228,47 @@ namespace MyApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.HasKey("orari_id");
+                    b.HasKey("orar_id");
 
                     b.ToTable("Orari");
+                });
+
+            modelBuilder.Entity("MyApp.Domain.Pagesat", b =>
+                {
+                    b.Property<int>("pagese_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("pagese_id"));
+
+                    b.Property<int>("anetar_id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("anetaresim_id")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("data_pageses")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("metoda")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<decimal>("shuma")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("statusi")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("pagese_id");
+
+                    b.HasIndex("anetar_id");
+
+                    b.HasIndex("anetaresim_id");
+
+                    b.ToTable("Pagesat");
                 });
 
             modelBuilder.Entity("MyApp.Domain.Produktet", b =>
@@ -227,8 +279,9 @@ namespace MyApp.Infrastructure.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("produkti_id"));
 
-                    b.Property<double>("cmimi")
-                        .HasColumnType("double");
+                    b.Property<decimal>("cmimi")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("emri")
                         .IsRequired()
@@ -242,12 +295,46 @@ namespace MyApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("sasia_stock")
+                    b.Property<int>("sasia_stok")
                         .HasColumnType("int");
 
                     b.HasKey("produkti_id");
 
                     b.ToTable("Produktet");
+                });
+
+            modelBuilder.Entity("MyApp.Domain.Regjistrimet", b =>
+                {
+                    b.Property<int>("regjistrim_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("regjistrim_id"));
+
+                    b.Property<int>("anetar_id")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("data")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("orar_id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("shenimet")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("statusi")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("regjistrim_id");
+
+                    b.HasIndex("anetar_id");
+
+                    b.HasIndex("orar_id");
+
+                    b.ToTable("Regjistrimet");
                 });
 
             modelBuilder.Entity("MyApp.Domain.Regjistrimi_Workshop", b =>
@@ -272,7 +359,7 @@ namespace MyApp.Infrastructure.Migrations
 
                     b.HasKey("rw_id");
 
-                    b.ToTable("Regjistrimi_Workshop");
+                    b.ToTable("Regjistrimet_Workshop");
                 });
 
             modelBuilder.Entity("MyApp.Domain.Salla", b =>
@@ -300,7 +387,7 @@ namespace MyApp.Infrastructure.Migrations
 
                     b.HasKey("salla_id");
 
-                    b.ToTable("Salla");
+                    b.ToTable("Sallat");
                 });
 
             modelBuilder.Entity("MyApp.Domain.Shitjet_Produkteve", b =>
@@ -314,8 +401,9 @@ namespace MyApp.Infrastructure.Migrations
                     b.Property<int>("anetar_id")
                         .HasColumnType("int");
 
-                    b.Property<double>("cmimi_total")
-                        .HasColumnType("double");
+                    b.Property<decimal>("cmimi_total")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("data")
                         .HasColumnType("datetime(6)");
@@ -328,6 +416,10 @@ namespace MyApp.Infrastructure.Migrations
 
                     b.HasKey("shitje_id");
 
+                    b.HasIndex("anetar_id");
+
+                    b.HasIndex("produkti_id");
+
                     b.ToTable("Shitjet_Produkteve");
                 });
 
@@ -339,8 +431,9 @@ namespace MyApp.Infrastructure.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("workshop_id"));
 
-                    b.Property<double>("cmimi")
-                        .HasColumnType("double");
+                    b.Property<decimal>("cmimi")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("data")
                         .HasColumnType("datetime(6)");
@@ -367,7 +460,78 @@ namespace MyApp.Infrastructure.Migrations
 
                     b.HasKey("workshop_id");
 
-                    b.ToTable("Workshop");
+                    b.ToTable("Workshopet");
+                });
+
+            modelBuilder.Entity("MyApp.Domain.Anetaresimet", b =>
+                {
+                    b.HasOne("MyApp.Domain.Anetaret", null)
+                        .WithMany()
+                        .HasForeignKey("anetar_id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("MyApp.Domain.Pagesat", b =>
+                {
+                    b.HasOne("MyApp.Domain.Anetaret", "Anetari")
+                        .WithMany()
+                        .HasForeignKey("anetar_id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MyApp.Domain.Anetaresimet", "Anetaresimi")
+                        .WithMany()
+                        .HasForeignKey("anetaresim_id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Anetaresimi");
+
+                    b.Navigation("Anetari");
+                });
+
+            modelBuilder.Entity("MyApp.Domain.Regjistrimet", b =>
+                {
+                    b.HasOne("MyApp.Domain.Anetaret", "Anetari")
+                        .WithMany()
+                        .HasForeignKey("anetar_id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MyApp.Domain.Orari", "Orari")
+                        .WithMany()
+                        .HasForeignKey("orar_id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Anetari");
+
+                    b.Navigation("Orari");
+                });
+
+            modelBuilder.Entity("MyApp.Domain.Shitjet_Produkteve", b =>
+                {
+                    b.HasOne("MyApp.Domain.Anetaret", "Anetari")
+                        .WithMany()
+                        .HasForeignKey("anetar_id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MyApp.Domain.Produktet", "Produkti")
+                        .WithMany("Shitjet")
+                        .HasForeignKey("produkti_id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Anetari");
+
+                    b.Navigation("Produkti");
+                });
+
+            modelBuilder.Entity("MyApp.Domain.Produktet", b =>
+                {
+                    b.Navigation("Shitjet");
                 });
 #pragma warning restore 612, 618
         }

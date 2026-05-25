@@ -5,7 +5,7 @@ namespace MyApp.Domain;
 public class Orari
 {
     [Key]
-    public int orari_id { get; set; }
+    public int orar_id { get; set; }
     public int klasa_id { get; set; }
     public string dita_javes { get; set; } = string.Empty;
     public string ora_fillimit { get; set; } = string.Empty;

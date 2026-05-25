@@ -40,7 +40,7 @@ namespace MyApp.Infrastructure.Migrations
                     b.Property<DateTime>("data_fillimit")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<DateTime>("data_perfundimit")
+                    b.Property<DateTime>("data_mbarimit")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("lloji")
@@ -207,7 +207,7 @@ namespace MyApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("klase_id")
+                    b.Property<int>("klasa_id")
                         .HasColumnType("int");
 
                     b.Property<string>("ora_fillimit")
@@ -462,13 +462,11 @@ namespace MyApp.Infrastructure.Migrations
 
             modelBuilder.Entity("MyApp.Domain.Anetaresimet", b =>
                 {
-                    b.HasOne("MyApp.Domain.Anetaret", "Anetari")
+                    b.HasOne("MyApp.Domain.Anetaret", null)
                         .WithMany()
                         .HasForeignKey("anetar_id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Anetari");
                 });
 
             modelBuilder.Entity("MyApp.Domain.Pagesat", b =>

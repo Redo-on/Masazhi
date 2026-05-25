@@ -105,7 +105,7 @@ namespace MyApp.Infrastructure.Migrations
                 {
                     orar_id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    klase_id = table.Column<int>(type: "int", nullable: false),
+                    klasa_id = table.Column<int>(type: "int", nullable: false),
                     dita_javes = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ora_fillimit = table.Column<string>(type: "longtext", nullable: false)
@@ -214,7 +214,7 @@ namespace MyApp.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     cmimi = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     data_fillimit = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    data_perfundimit = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    data_mbarimit = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     statusi = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },

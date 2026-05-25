@@ -80,7 +80,7 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Anetaresimet>()
-            .HasOne(a => a.Anetari)
+            .HasOne<Anetaret>()
             .WithMany()
             .HasForeignKey(a => a.anetar_id)
             .OnDelete(DeleteBehavior.Restrict);

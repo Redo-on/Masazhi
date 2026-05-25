@@ -1,37 +1,101 @@
 using Microsoft.AspNetCore.Mvc;
-using MyApp.Domain; // This allows the controller to "see" your 4 entities
+using Microsoft.EntityFrameworkCore;
+using MyApp.Domain;
+using MyApp.Infrastructure.Data; 
 
-namespace MyApp.API.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class AnetaretController : ControllerBase
+namespace MyApp.API.Controllers
 {
-    // 1. Members Endpoints (Anetaret)
-    [HttpGet]
-    public ActionResult<IEnumerable<Anetaret>> GetAnetaret()
+    [ApiController]
+    [Route("api/[controller]")]
+    public class AnetaretController : ControllerBase
     {
-        return Ok(new List<Anetaret>()); // Returns an empty list of Anetaret
-    }
+        private readonly AppDbContext _context;
 
-    // 2. Instructors Endpoints (Instruktoret)
-    [HttpGet("instruktoret")]
-    public ActionResult<IEnumerable<Instruktoret>> GetInstruktoret()
-    {
-        return Ok(new List<Instruktoret>());
-    }
+        public AnetaretController(AppDbContext context)
+        {
+            _context = context;
+        }
 
-    // 3. Classes Endpoints (Klasat)
-    [HttpGet("klasat")]
-    public ActionResult<IEnumerable<Klasat>> GetKlasat()
-    {
-        return Ok(new List<Klasat>());
-    }
+        // GET: api/Anetaret
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Anetaret>>> GetAnetaret()
+        {
+            return await _context.Anetaret.ToListAsync();
+        }
 
-    // 4. Memberships Endpoints (Anetaresimet)
-    [HttpGet("anetaresimet")]
-    public ActionResult<IEnumerable<Anetaresimet>> GetAnetaresimet()
-    {
-        return Ok(new List<Anetaresimet>());
+        // GET: api/Anetaret/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Anetaret>> GetAnetar(int id)
+        {
+            var anetar = await _context.Anetaret.FindAsync(id);
+
+            if (anetar == null)
+            {
+                return NotFound();
+            }
+
+            return anetar;
+        }
+
+        // POST: api/Anetaret
+        [HttpPost]
+        public async Task<ActionResult<Anetaret>> PostAnetar(Anetaret anetar)
+        {
+            _context.Anetaret.Add(anetar);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetAnetar), new { id = anetar.anetar_id }, anetar);
+        }
+
+        // PUT: api/Anetaret/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutAnetar(int id, Anetaret anetar)
+        {
+            if (id != anetar.anetar_id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(anetar).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!AnetarExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // DELETE: api/Anetaret/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAnetar(int id)
+        {
+            var anetar = await _context.Anetaret.FindAsync(id);
+            if (anetar == null)
+            {
+                return NotFound();
+            }
+
+            _context.Anetaret.Remove(anetar);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool AnetarExists(int id)
+        {
+            return _context.Anetaret.Any(e => e.anetar_id == id);
+        }
     }
 }
