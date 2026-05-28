@@ -16,6 +16,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Register Services (Colleague's additions)
 builder.Services.AddScoped<IProduktetService, ProduktetService>();
 builder.Services.AddScoped<IShitjetProdukteveService, ShitjetProdukteveService>();
+builder.Services.AddScoped<IOrariService, OrariService>();
+builder.Services.AddScoped<ISallaService, SallaService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
