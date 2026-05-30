@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using MyApp.Application.Interfaces;
 using MyApp.Domain;
-using MyApp.Infrastructure.Data;
 
 namespace MyApp.API.Controllers
 {
@@ -9,96 +8,49 @@ namespace MyApp.API.Controllers
     [Route("api/[controller]")]
     public class RegjistrimetController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IRegjistrimetService _regjistrimetService;
 
-        public RegjistrimetController(AppDbContext context)
+        public RegjistrimetController(IRegjistrimetService regjistrimetService)
         {
-            _context = context;
+            _regjistrimetService = regjistrimetService;
         }
 
-        // GET: api/Regjistrimet
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Regjistrimet>>> GetRegjistrimet()
         {
-            return await _context.Regjistrimet.ToListAsync();
+            var regjistrimet = await _regjistrimetService.GetAllAsync();
+            return Ok(regjistrimet);
         }
 
-        // GET: api/Regjistrimet/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Regjistrimet>> GetRegjistrim(int id)
         {
-            var regjistrim = await _context.Regjistrimet.FindAsync(id);
-
-            if (regjistrim == null)
-            {
-                return NotFound();
-            }
-
-            return regjistrim;
+            var regjistrim = await _regjistrimetService.GetByIdAsync(id);
+            if (regjistrim == null) return NotFound();
+            return Ok(regjistrim);
         }
 
-        // POST: api/Regjistrimet
         [HttpPost]
         public async Task<ActionResult<Regjistrimet>> PostRegjistrim(Regjistrimet regjistrim)
         {
-            _context.Regjistrimet.Add(regjistrim);
-            await _context.SaveChangesAsync();
-
-            // Note: Update "regjistrimi_id" if your primary key property is named differently
-            return CreatedAtAction(nameof(GetRegjistrim), new { id = regjistrim.regjistrim_id }, regjistrim);
+            var createdRegjistrim = await _regjistrimetService.CreateAsync(regjistrim);
+            return CreatedAtAction(nameof(GetRegjistrim), new { id = createdRegjistrim.regjistrim_id }, createdRegjistrim);
         }
 
-        // PUT: api/Regjistrimet/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutRegjistrim(int id, Regjistrimet regjistrim)
         {
-            // Note: Update "regjistrimi_id" if your primary key property is named differently
-            if (id != regjistrim.regjistrim_id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(regjistrim).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RegjistrimExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+            var success = await _regjistrimetService.UpdateAsync(id, regjistrim);
+            if (!success) return BadRequest();
             return NoContent();
         }
 
-        // DELETE: api/Regjistrimet/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRegjistrim(int id)
         {
-            var regjistrim = await _context.Regjistrimet.FindAsync(id);
-            if (regjistrim == null)
-            {
-                return NotFound();
-            }
-
-            _context.Regjistrimet.Remove(regjistrim);
-            await _context.SaveChangesAsync();
-
+            var success = await _regjistrimetService.DeleteAsync(id);
+            if (!success) return NotFound();
             return NoContent();
-        }
-
-        private bool RegjistrimExists(int id)
-        {
-            // Note: Update "regjistrimi_id" if your primary key property is named differently
-            return _context.Regjistrimet.Any(e => e.regjistrim_id == id);
         }
     }
 }

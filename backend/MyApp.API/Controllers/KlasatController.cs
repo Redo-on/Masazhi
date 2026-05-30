@@ -1,101 +1,56 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using MyApp.Application.Interfaces;
 using MyApp.Domain;
-using MyApp.Infrastructure.Data;
 
 namespace MyApp.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class KlasatController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IKlasatService _klasatService;
 
-        public KlasatController(AppDbContext context)
+        public KlasatController(IKlasatService klasatService)
         {
-            _context = context;
+            _klasatService = klasatService;
         }
 
-        // GET: api/Klasat
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Klasat>>> GetKlasat()
         {
-            return await _context.Klasat.ToListAsync();
+            var klasat = await _klasatService.GetAllAsync();
+            return Ok(klasat);
         }
 
-        // GET: api/Klasat/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Klasat>> GetKlase(int id)
+        public async Task<ActionResult<Klasat>> GetKlasa(int id)
         {
-            var klase = await _context.Klasat.FindAsync(id);
-
-            if (klase == null)
-            {
-                return NotFound();
-            }
-
-            return klase;
+            var klasa = await _klasatService.GetByIdAsync(id);
+            if (klasa == null) return NotFound();
+            return Ok(klasa);
         }
 
-        // POST: api/Klasat
         [HttpPost]
-        public async Task<ActionResult<Klasat>> PostKlase(Klasat klase)
+        public async Task<ActionResult<Klasat>> PostKlasa(Klasat klasa)
         {
-            _context.Klasat.Add(klase);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetKlase), new { id = klase.klase_id }, klase);
+            var createdKlasa = await _klasatService.CreateAsync(klasa);
+            return CreatedAtAction(nameof(GetKlasa), new { id = createdKlasa.klase_id }, createdKlasa);
         }
 
-        // PUT: api/Klasat/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutKlase(int id, Klasat klase)
+        public async Task<IActionResult> PutKlasa(int id, Klasat klasa)
         {
-            if (id != klase.klase_id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(klase).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!KlaseExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+            var success = await _klasatService.UpdateAsync(id, klasa);
+            if (!success) return BadRequest();
             return NoContent();
         }
 
-        // DELETE: api/Klasat/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteKlase(int id)
+        public async Task<IActionResult> DeleteKlasa(int id)
         {
-            var klase = await _context.Klasat.FindAsync(id);
-            if (klase == null)
-            {
-                return NotFound();
-            }
-
-            _context.Klasat.Remove(klase);
-            await _context.SaveChangesAsync();
-
+            var success = await _klasatService.DeleteAsync(id);
+            if (!success) return NotFound();
             return NoContent();
-        }
-
-        private bool KlaseExists(int id)
-        {
-            return _context.Klasat.Any(e => e.klase_id == id);
         }
     }
 }

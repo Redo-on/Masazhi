@@ -23,7 +23,7 @@ public class AppDbContext : DbContext
     public DbSet<Regjistrimi_Workshop> Regjistrimet_Workshop { get; set; } = null!;
     public DbSet<Produktet> Produktet { get; set; } = null!;
     public DbSet<Shitjet_Produkteve> Shitjet_Produkteve { get; set; } = null!;
-
+    public DbSet<User> Users { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

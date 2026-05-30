@@ -7,17 +7,26 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-// Using your hardcoded connection string inside your colleague's setup
+
 var connectionString = "Server=localhost;Database=YogaCenterDB;User=root;Password=;";
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// Register Services (Colleague's additions)
+
 builder.Services.AddScoped<IProduktetService, ProduktetService>();
 builder.Services.AddScoped<IShitjetProdukteveService, ShitjetProdukteveService>();
 builder.Services.AddScoped<IOrariService, OrariService>();
 builder.Services.AddScoped<ISallaService, SallaService>();
+builder.Services.AddScoped<IAnetaretService, AnetaretService>();
+builder.Services.AddScoped<IInstruktoretService, InstruktoretService>();
+builder.Services.AddScoped<IKlasatService, KlasatService>();
+builder.Services.AddScoped<IRegjistrimetService, RegjistrimetService>();
+builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<IWorkshopService, WorkshopService>();
+builder.Services.AddScoped<IRegjistrimiWorkshopService, RegjistrimiWorkshopService>();
+builder.Services.AddScoped<IAnetaresimetService, AnetaresimetService>();
+builder.Services.AddScoped<IPagesatService, PagesatService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -33,7 +42,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Auto-migrate database (Colleague's addition)
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
