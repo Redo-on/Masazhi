@@ -1,38 +1,58 @@
+using MyApp.Domain;
+using MyApp.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using MyApp.Domain; // This allows the controller to "see" your 4 entities
 
-namespace MyApp.API.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class AnetaretController : ControllerBase
+namespace MyApp.API.Controllers
 {
-    // 1. Members Endpoints (Anetaret)
-    [HttpGet]
-    public ActionResult<IEnumerable<Anetaret>> GetAnetaret()
+    [ApiController]
+    [Route("api/[controller]")]
+    public class AnetaretController : ControllerBase
     {
-        return Ok(new List<Anetaret>()); // Returns an empty list of Anetaret
-    }
+        private readonly IAnetaretService _anetaretService;
 
-    // 2. Instructors Endpoints (Instruktoret)
-    [HttpGet("instruktoret")]
-    public ActionResult<IEnumerable<Instruktoret>> GetInstruktoret()
-    {
-        return Ok(new List<Instruktoret>());
-    }
+        
+        public AnetaretController(IAnetaretService anetaretService)
+        {
+            _anetaretService = anetaretService;
+        }
 
-    // 3. Classes Endpoints (Klasat)
-    [HttpGet("klasat")]
-    public ActionResult<IEnumerable<Klasat>> GetKlasat()
-    {
-        return Ok(new List<Klasat>());
-    }
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Anetaret>>> GetAnetaret()
+        {
+            var anetaret = await _anetaretService.GetAllAsync();
+            return Ok(anetaret);
+        }
 
-    // 4. Memberships Endpoints (Anetaresimet)
-    [HttpGet("anetaresimet")]
-    public ActionResult<IEnumerable<Anetaresimet>> GetAnetaresimet()
-    {
-        return Ok(new List<Anetaresimet>());
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Anetaret>> GetAnetar(int id)
+        {
+            var anetar = await _anetaretService.GetByIdAsync(id);
+            if (anetar == null) return NotFound();
+            return Ok(anetar);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Anetaret>> PostAnetar(Anetaret anetar)
+        {
+            var createdAnetar = await _anetaretService.CreateAsync(anetar);
+            return CreatedAtAction(nameof(GetAnetar), new { id = createdAnetar.anetar_id }, createdAnetar);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutAnetar(int id, Anetaret anetar)
+        {
+            var success = await _anetaretService.UpdateAsync(id, anetar);
+            if (!success) return BadRequest();
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAnetar(int id)
+        {
+            var success = await _anetaretService.DeleteAsync(id);
+            if (!success) return NotFound();
+            return NoContent();
+        }
     }
 
     // 5. Registration Endpoints (Regjistrimet)

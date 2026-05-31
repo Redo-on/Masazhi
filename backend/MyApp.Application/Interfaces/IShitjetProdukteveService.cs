@@ -1,0 +1,14 @@
+using MyApp.Domain;
+
+namespace MyApp.Application.Interfaces;
+
+public interface IShitjetProdukteveService
+{
+    Task<IEnumerable<Shitjet_Produkteve>> GetAllAsync();
+    Task<Shitjet_Produkteve?> GetByIdAsync(int id);
+    Task<IEnumerable<Shitjet_Produkteve>> GetByAnetarAsync(int anetarId);
+    Task<IEnumerable<Shitjet_Produkteve>> GetByProduktetAsync(int produktiId);
+    Task<Shitjet_Produkteve> CreateAsync(Shitjet_Produkteve shitje);
+    Task UpdateAsync(Shitjet_Produkteve shitje);
+    Task DeleteAsync(int id);
+}
