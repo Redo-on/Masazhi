@@ -53,31 +53,30 @@ namespace MyApp.API.Controllers
             if (!success) return NotFound();
             return NoContent();
         }
-    }
 
-    // 5. Registration Endpoints (Regjistrimet)
-    [HttpGet("regjistrimet")]
-    public ActionResult<IEnumerable<Regjistrimet>> GetRegjistrimet()
-    {
-        return Ok(new List<Regjistrimet>());
-    }
+        // 5. Registration Endpoints (Regjistrimet)
+        [HttpGet("regjistrimet")]
+        public ActionResult<IEnumerable<Regjistrimet>> GetRegjistrimet()
+        {
+            return Ok(new List<Regjistrimet>());
+        }
 
-    [HttpPost("regjistrimet")]
-    public ActionResult<Regjistrimet> CreateRegjistrimet(Regjistrimet regjistrim)
-    {
-        return CreatedAtAction(nameof(GetRegjistrimet), new { id = regjistrim.regjistrim_id }, regjistrim);
-    }
+        [HttpPost("regjistrimet")]
+        public ActionResult<Regjistrimet> CreateRegjistrimet(Regjistrimet regjistrim)
+        {
+            return CreatedAtAction(nameof(GetRegjistrimet), new { id = regjistrim.regjistrim_id }, regjistrim);
+        }
 
-    // 6. Payment Endpoints (Pagesat)
-    [HttpGet("pagesat")]
-    public ActionResult<IEnumerable<Pagesat>> GetPagesat()
-    {
-        return Ok(new List<Pagesat>());
-    }
+        // 6. Payment Endpoints (Pagesat)
+        [HttpGet("pagesat")]
+        public ActionResult<IEnumerable<Pagesat>> GetPagesat()
+        {
+            return Ok(new List<Pagesat>());
+        }
 
-    [HttpPost("pagesat")]
-    public ActionResult<Pagesat> CreatePagesat(Pagesat pagesa)
-    {
-        return CreatedAtAction(nameof(GetPagesat), new { id = pagesa.pagese_id }, pagesa);
+        [HttpPost("pagesat")]
+        public ActionResult<Pagesat> CreatePagesat(Pagesat pagesa)
+        {
+            return CreatedAtAction(nameof(GetPagesat), new { id = pagesa.pagese_id }, pagesa);
+        }
     }
-}
