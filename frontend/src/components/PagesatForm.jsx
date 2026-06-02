@@ -11,23 +11,61 @@ const emptyPagesa = {
 
 export default function PagesatForm({ onSaved }) {
   const [form, setForm] = useState(emptyPagesa)
+  const [members, setMembers] = useState([])
+  const [anetaresimet, setAnetaresimet] = useState([])
   const [isSaving, setIsSaving] = useState(false)
+  const [validationError, setValidationError] = useState('')
 
   useEffect(() => {
     setForm(emptyPagesa)
+
+    const loadMembers = async () => {
+      try {
+        const response = await fetch('/api/Anetaret')
+        if (!response.ok) throw new Error('Could not load members')
+        setMembers(await response.json())
+      } catch (error) {
+        console.error(error)
+        setMembers([])
+      }
+    }
+
+    const loadSubscriptions = async () => {
+      try {
+        const response = await fetch('/api/Anetaresimet')
+        if (!response.ok) throw new Error('Could not load subscriptions')
+        setAnetaresimet(await response.json())
+      } catch (error) {
+        console.error(error)
+        setAnetaresimet([])
+      }
+    }
+
+    loadMembers()
+    loadSubscriptions()
   }, [])
 
   const handleChange = (event) => {
     const { name, value } = event.target
+    setValidationError('')
     setForm((current) => ({ ...current, [name]: value }))
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    setValidationError('')
+
+    const anetarId = Number(form.anetar_id)
+    const anetaresimId = Number(form.anetaresim_id)
+    if (!anetarId || !anetaresimId) {
+      setValidationError('Zgjidhni një anëtar dhe një anëtarësim të vlefshëm.')
+      setIsSaving(false)
+      return
+    }
 
     const payload = {
-      anetar_id: Number(form.anetar_id) || 0,
-      anetaresim_id: Number(form.anetaresim_id) || 0,
+      anetar_id: anetarId,
+      anetaresim_id: anetaresimId,
       shuma: Number(form.shuma) || 0,
       metoda: form.metoda,
       data_pageses: form.data_pageses || new Date().toISOString(),
@@ -61,20 +99,39 @@ export default function PagesatForm({ onSaved }) {
       <h2>Regjistro Pagesë të Re</h2>
       <form onSubmit={handleSubmit} className="form-grid">
         <label>
-          Anëtar ID
-          <input name="anetar_id" type="number" value={form.anetar_id} onChange={handleChange} min="1" required />
+          Anëtar
+          <select
+            name="anetar_id"
+            value={form.anetar_id}
+            onChange={handleChange}
+            required
+            disabled={members.length === 0}
+          >
+            <option value="">Zgjidh anëtar</option>
+            {members.map((member) => (
+              <option key={member.anetar_id} value={member.anetar_id}>
+                {member.emri}
+              </option>
+            ))}
+          </select>
         </label>
 
         <label>
-          Anëtarësim ID
-          <input
+          Anëtarësim
+          <select
             name="anetaresim_id"
-            type="number"
             value={form.anetaresim_id}
             onChange={handleChange}
-            min="1"
             required
-          />
+            disabled={anetaresimet.length === 0}
+          >
+            <option value="">Zgjidh anëtarësim</option>
+            {anetaresimet.map((item) => (
+              <option key={item.anetaresimi_id} value={item.anetaresimi_id}>
+                {item.anetaresimi_id} - {item.lloji} ({item.statusi})
+              </option>
+            ))}
+          </select>
         </label>
 
         <label>
@@ -97,8 +154,10 @@ export default function PagesatForm({ onSaved }) {
           <input name="statusi" value={form.statusi} onChange={handleChange} required />
         </label>
 
+        {validationError && <p className="form-error">{validationError}</p>}
+
         <div className="form-actions">
-          <button type="submit" disabled={isSaving} className="button button-primary">
+          <button type="submit" disabled={isSaving || Boolean(validationError)} className="button button-primary">
             {isSaving ? 'Duke Ruajtur...' : 'Regjistro Pagesë'}
           </button>
         </div>
