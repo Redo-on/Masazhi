@@ -1,108 +1,96 @@
-import { useEffect, useState } from 'react'
+import React, { useState } from 'react';
 
-const emptyPagesa = {
-  anetar_id: '',
-  anetaresim_id: '',
-  shuma: '',
-  metoda: '',
-  data_pageses: '',
-  statusi: '',
-}
+const PagesatForm = () => {
+    const [anetarId, setAnetarId] = useState('');
+    const [anetaresimId, setAnetaresimId] = useState('');
+    const [shuma, setShuma] = useState('');
+    const [metoda, setMetoda] = useState('Cash'); 
 
-export default function PagesatForm({ onSaved }) {
-  const [form, setForm] = useState(emptyPagesa)
-  const [isSaving, setIsSaving] = useState(false)
+    const handleSubmit = async (e) => {
+        e.preventDefault(); 
 
-  useEffect(() => {
-    setForm(emptyPagesa)
-  }, [])
+        const paymentData = {
+            anetar_id: parseInt(anetarId),
+            anetaresim_id: parseInt(anetaresimId),
+            shuma: parseFloat(shuma),
+            metoda: metoda,
+            statusi: "E Paguar", 
+            data_pageses: new Date().toISOString() 
+        };
 
-  const handleChange = (event) => {
-    const { name, value } = event.target
-    setForm((current) => ({ ...current, [name]: value }))
-  }
+        try {
+            const response = await fetch('http://localhost:5244/api/Anetaret/pagesat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(paymentData),
+            });
 
-  const handleSubmit = async (event) => {
-    event.preventDefault()
+            if (response.ok) {
+                alert("Pagesa u regjistrua me sukses!");
+                setAnetarId('');
+                setAnetaresimId('');
+                setShuma('');
+                setMetoda('Cash');
+            } else {
+                alert("Ndodhi një gabim! Kontrollo të dhënat.");
+            }
+        } catch (error) {
+            console.error("Error connecting to backend:", error);
+            alert("Nuk mund të lidhet me serverin.");
+        }
+    };
 
-    const payload = {
-      anetar_id: Number(form.anetar_id) || 0,
-      anetaresim_id: Number(form.anetaresim_id) || 0,
-      shuma: Number(form.shuma) || 0,
-      metoda: form.metoda,
-      data_pageses: form.data_pageses || new Date().toISOString(),
-      statusi: form.statusi,
-    }
+    return (
+        <div className="form-container">
+            <h2>Regjistro Pagesë të Re</h2>
+            <form onSubmit={handleSubmit}>
+                
+                <div>
+                    <label>ID e Anëtarit:</label>
+                    <input 
+                        type="number" 
+                        value={anetarId} 
+                        onChange={(e) => setAnetarId(e.target.value)} 
+                        required 
+                    />
+                </div>
 
-    setIsSaving(true)
-    try {
-      const response = await fetch('/api/Anetaret/pagesat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
+                <div>
+                    <label>ID e Anëtarësimit:</label>
+                    <input 
+                        type="number" 
+                        value={anetaresimId} 
+                        onChange={(e) => setAnetaresimId(e.target.value)} 
+                        required 
+                    />
+                </div>
 
-      if (!response.ok) {
-        throw new Error('Failed to save payment')
-      }
+                <div>
+                    <label>Shuma (€):</label>
+                    <input 
+                        type="number" 
+                        step="0.01"
+                        value={shuma} 
+                        onChange={(e) => setShuma(e.target.value)} 
+                        required 
+                    />
+                </div>
 
-      setForm(emptyPagesa)
-      onSaved?.()
-    } catch (error) {
-      console.error(error)
-      alert('Pagesa dështoi. Kontrolloni të dhënat dhe provoni përsëri.')
-    } finally {
-      setIsSaving(false)
-    }
-  }
+                <div>
+                    <label>Metoda e Pagesës:</label>
+                    <select value={metoda} onChange={(e) => setMetoda(e.target.value)}>
+                        <option value="Cash">Cash</option>
+                        <option value="Karta">Karta</option>
+                        <option value="Banka">Banka</option>
+                    </select>
+                </div>
 
-  return (
-    <section className="card form-card">
-      <h2>Regjistro Pagesë të Re</h2>
-      <form onSubmit={handleSubmit} className="form-grid">
-        <label>
-          Anëtar ID
-          <input name="anetar_id" type="number" value={form.anetar_id} onChange={handleChange} min="1" required />
-        </label>
-
-        <label>
-          Anëtarësim ID
-          <input
-            name="anetaresim_id"
-            type="number"
-            value={form.anetaresim_id}
-            onChange={handleChange}
-            min="1"
-            required
-          />
-        </label>
-
-        <label>
-          Shuma
-          <input name="shuma" type="number" value={form.shuma} onChange={handleChange} min="0" step="0.01" required />
-        </label>
-
-        <label>
-          Metoda
-          <input name="metoda" value={form.metoda} onChange={handleChange} required />
-        </label>
-
-        <label>
-          Data Pagesës
-          <input name="data_pageses" type="date" value={form.data_pageses} onChange={handleChange} required />
-        </label>
-
-        <label>
-          Statusi
-          <input name="statusi" value={form.statusi} onChange={handleChange} required />
-        </label>
-
-        <div className="form-actions">
-          <button type="submit" disabled={isSaving} className="button button-primary">
-            {isSaving ? 'Duke Ruajtur...' : 'Regjistro Pagesë'}
-          </button>
+                <button type="submit">Ruaj Pagesën</button>
+            </form>
         </div>
-      </form>
-    </section>
-  )
-}
+    );
+};
+
+export default PagesatForm;

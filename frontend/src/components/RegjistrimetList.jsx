@@ -11,7 +11,7 @@ export default function RegjistrimetList({ refreshKey }) {
       if (!response.ok) throw new Error('Could not load registrations')
       setItems(await response.json())
     } catch (error) {
-      console.error(error)
+      console.error("Fetch error:", error)
       setItems([])
     } finally {
       setLoading(false)

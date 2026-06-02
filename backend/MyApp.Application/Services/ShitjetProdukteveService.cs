@@ -70,4 +70,14 @@ public class ShitjetProdukteveService : IShitjetProdukteveService
             await _context.SaveChangesAsync();
         }
     }
+
+    public Task<bool> UpdateAsync(int id, Shitjet_Produkteve shitje)
+    {
+        throw new NotImplementedException();
+    }
+
+    Task<bool> IShitjetProdukteveService.DeleteAsync(int id)
+    {
+        throw new NotImplementedException();
+    }
 }

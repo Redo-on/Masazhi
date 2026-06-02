@@ -2,14 +2,14 @@ namespace MyApp.Domain;
 
 public class Regjistrimet
 {
-    public int regjistrim_id { get; set; } // PK
+    public int regjistrim_id { get; set; } 
     
-    // Foreign Keys
+    // FK
     public int anetar_id { get; set; }
-    public Anetaret Anetari { get; set; } = null!;
+    public Anetaret? Anetari { get; set; } 
     
     public int orar_id { get; set; }
-    public Orari Orari { get; set; } = null!;
+    public Orari? Orari { get; set; }    
     
     // Properties
     public DateTime data { get; set; }

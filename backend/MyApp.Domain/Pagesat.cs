@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace MyApp.Domain;
 
 public class Pagesat
@@ -6,10 +8,12 @@ public class Pagesat
     
     // Foreign Keys
     public int anetar_id { get; set; }
-    public Anetaret Anetari { get; set; } = null!;
     
+    [ForeignKey("anetar_id")]
+    public Anetaret? Anetari { get; set;}
     public int anetaresim_id { get; set; }
-    public Anetaresimet Anetaresimi { get; set; } = null!;
+    [ForeignKey("anetaresim_id")]
+    public Anetaresimet? Anetaresimi { get; set; }
     
     // Properties
     public DateTime data_pageses { get; set; }

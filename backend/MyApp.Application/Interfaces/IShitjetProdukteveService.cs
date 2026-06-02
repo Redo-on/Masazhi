@@ -9,6 +9,8 @@ public interface IShitjetProdukteveService
     Task<IEnumerable<Shitjet_Produkteve>> GetByAnetarAsync(int anetarId);
     Task<IEnumerable<Shitjet_Produkteve>> GetByProduktetAsync(int produktiId);
     Task<Shitjet_Produkteve> CreateAsync(Shitjet_Produkteve shitje);
-    Task UpdateAsync(Shitjet_Produkteve shitje);
-    Task DeleteAsync(int id);
+    
+    // Change these two lines to match your Controller:
+    Task<bool> UpdateAsync(int id, Shitjet_Produkteve shitje);
+    Task<bool> DeleteAsync(int id);
 }

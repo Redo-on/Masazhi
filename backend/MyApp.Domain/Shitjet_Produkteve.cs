@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyApp.Domain;
 
@@ -7,12 +8,16 @@ public class Shitjet_Produkteve
     [Key]
     public int shitje_id { get; set; }
 
-    // Foreign Keys
+    // Fk
     public int anetar_id { get; set; }
-    public Anetaret Anetari { get; set; } = null!;
+    
+    [ForeignKey("anetar_id")]
+    public Anetaret? Anetari { get; set; } 
 
     public int produkti_id { get; set; }
-    public Produktet Produkti { get; set; } = null!;
+    
+    [ForeignKey("produkti_id")]
+    public Produktet? Produkti { get; set; } 
 
     // Properties
     public int sasia { get; set; }
