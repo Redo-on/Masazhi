@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 export default function ShitjetList({ refreshKey, onEdit }) {
   const [sales, setSales] = useState([])
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
 
   const loadSales = async () => {
     setLoading(true)
@@ -17,6 +18,23 @@ export default function ShitjetList({ refreshKey, onEdit }) {
       setLoading(false)
     }
   }
+
+  const filteredSales = useMemo(
+    () =>
+      sales.filter((sale) => {
+        const query = search.trim().toLowerCase()
+        if (!query) return true
+        const memberName = sale.Anetari?.emri ?? sale.anetari?.emri ?? ''
+        const produktName = sale.Produkti?.emri ?? sale.produkti?.emri ?? ''
+        const saleDate = sale.data?.split?.('T')[0] ?? ''
+        return (
+          memberName.toLowerCase().includes(query) ||
+          produktName.toLowerCase().includes(query) ||
+          saleDate.includes(query)
+        )
+      }),
+    [sales, search],
+  )
 
   useEffect(() => {
     loadSales()
@@ -40,14 +58,27 @@ export default function ShitjetList({ refreshKey, onEdit }) {
   return (
     <section className="card list-card">
       <div className="list-header">
-        <h2>Shitjet e Produkteve</h2>
-        <span>{sales.length} shitje të regjistruara</span>
+        <div>
+          <h2>Shitjet e Produkteve</h2>
+          <p className="list-note">Filtroni shitjet sipas anëtarit, produktit ose datës.</p>
+        </div>
+        <span>{filteredSales.length} shitje të regjistruara</span>
+      </div>
+
+      <div className="list-toolbar">
+        <input
+          type="search"
+          className="search-input"
+          placeholder="Kërko shitje sipas anëtarit, produktit, ose datës"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
       </div>
 
       {loading ? (
         <p className="loading">Duke ngarkuar shitjet...</p>
-      ) : sales.length === 0 ? (
-        <p className="empty-state">Nuk ka shitje të regjistruara.</p>
+      ) : filteredSales.length === 0 ? (
+        <p className="empty-state">Nuk u gjet asnjë shitje me këtë kriter.</p>
       ) : (
         <div className="table-responsive">
           <table>
@@ -62,7 +93,7 @@ export default function ShitjetList({ refreshKey, onEdit }) {
               </tr>
             </thead>
             <tbody>
-              {sales.map((sale) => (
+              {filteredSales.map((sale) => (
                 <tr key={sale.shitje_id}>
                   <td>{sale.Anetari?.emri ?? sale.anetari?.emri ?? sale.anetar_id}</td>
                   <td>{sale.Produkti?.emri ?? sale.produkti?.emri ?? sale.produkti_id}</td>

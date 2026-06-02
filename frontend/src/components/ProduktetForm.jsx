@@ -9,9 +9,13 @@ const emptyProduct = {
   sasia_stok: '',
 }
 
+const createToken = () =>
+  window.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`
+
 export default function ProduktetForm({ selected, onSaved, onCancel }) {
   const [form, setForm] = useState(emptyProduct)
   const [isSaving, setIsSaving] = useState(false)
+  const [requestToken, setRequestToken] = useState(() => createToken())
   const isEditing = selected?.produkti_id != null
 
   useEffect(() => {
@@ -47,6 +51,8 @@ export default function ProduktetForm({ selected, onSaved, onCancel }) {
 
     if (isEditing) {
       payload.produkti_id = form.produkti_id
+    } else {
+      payload.idempotency_token = requestToken
     }
 
     setIsSaving(true)
@@ -61,14 +67,22 @@ export default function ProduktetForm({ selected, onSaved, onCancel }) {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to save product')
+        const errorText = await response.text()
+        let parsed = null
+        try {
+          parsed = errorText ? JSON.parse(errorText) : null
+        } catch {
+          parsed = null
+        }
+        throw new Error(parsed?.message ?? 'Failed to save product')
       }
 
       setForm(emptyProduct)
+      setRequestToken(createToken())
       onSaved?.()
     } catch (error) {
       console.error(error)
-      alert('Produktet nuk mund të ruheshin. Kontrolloni të dhënat.')
+      alert(error?.message ?? 'Produktet nuk mund të ruheshin. Kontrolloni të dhënat.')
     } finally {
       setIsSaving(false)
     }

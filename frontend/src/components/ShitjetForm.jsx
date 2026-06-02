@@ -12,7 +12,9 @@ const emptySale = {
 export default function ShitjetForm({ selected, onSaved, onCancel }) {
   const [form, setForm] = useState(emptySale)
   const [products, setProducts] = useState([])
+  const [members, setMembers] = useState([])
   const [isSaving, setIsSaving] = useState(false)
+  const [validationError, setValidationError] = useState('')
   const isEditing = selected?.shitje_id != null
 
   useEffect(() => {
@@ -27,7 +29,19 @@ export default function ShitjetForm({ selected, onSaved, onCancel }) {
       }
     }
 
+    const loadMembers = async () => {
+      try {
+        const response = await fetch('/api/Anetaret')
+        if (!response.ok) throw new Error('Could not load members')
+        setMembers(await response.json())
+      } catch (error) {
+        console.error(error)
+        setMembers([])
+      }
+    }
+
     loadProducts()
+    loadMembers()
   }, [])
 
   useEffect(() => {
@@ -56,8 +70,32 @@ export default function ShitjetForm({ selected, onSaved, onCancel }) {
       if (!Number.isNaN(total)) {
         setForm((current) => ({ ...current, cmimi_total: total.toFixed(2) }))
       }
+    } else if (!form.sasia) {
+      setForm((current) => ({ ...current, cmimi_total: '' }))
     }
   }, [selectedProduct, form.sasia])
+
+  useEffect(() => {
+    if (!form.produkti_id || !form.sasia) {
+      setValidationError('')
+      return
+    }
+
+    const quantity = Number(form.sasia)
+    const stock = Number(selectedProduct?.sasia_stok ?? 0)
+
+    if (Number.isNaN(quantity) || quantity <= 0) {
+      setValidationError('Sasia duhet të jetë një numër pozitiv.')
+      return
+    }
+
+    if (selectedProduct && quantity > stock) {
+      setValidationError(`Sasia tejkalon stokun aktual (${stock}).`)
+      return
+    }
+
+    setValidationError('')
+  }, [form.produkti_id, form.sasia, selectedProduct])
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -66,6 +104,10 @@ export default function ShitjetForm({ selected, onSaved, onCancel }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    if (validationError) {
+      alert(validationError)
+      return
+    }
 
     const payload = {
       anetar_id: Number(form.anetar_id) || 0,
@@ -91,14 +133,21 @@ export default function ShitjetForm({ selected, onSaved, onCancel }) {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to save sale')
+        const errorText = await response.text()
+        let parsed = null
+        try {
+          parsed = errorText ? JSON.parse(errorText) : null
+        } catch {
+          parsed = null
+        }
+        throw new Error(parsed?.message ?? 'Failed to save sale')
       }
 
       setForm(emptySale)
       onSaved?.()
     } catch (error) {
       console.error(error)
-      alert('Regjistrimi i shitjes dështoi.')
+      alert(error?.message ?? 'Regjistrimi i shitjes dështoi.')
     } finally {
       setIsSaving(false)
     }
@@ -109,15 +158,15 @@ export default function ShitjetForm({ selected, onSaved, onCancel }) {
       <h2>{isEditing ? 'Edito Shitjen e Produktit' : 'Regjistro Shitje të Re'}</h2>
       <form onSubmit={handleSubmit} className="form-grid">
         <label>
-          Anëtar ID
-          <input
-            name="anetar_id"
-            type="number"
-            value={form.anetar_id}
-            onChange={handleChange}
-            min="1"
-            required
-          />
+          Anëtar
+          <select name="anetar_id" value={form.anetar_id} onChange={handleChange} required>
+            <option value="">Zgjidh anëtar</option>
+            {members.map((member) => (
+              <option key={member.anetar_id} value={member.anetar_id}>
+                {member.emri}
+              </option>
+            ))}
+          </select>
         </label>
 
         <label>
@@ -131,6 +180,13 @@ export default function ShitjetForm({ selected, onSaved, onCancel }) {
             ))}
           </select>
         </label>
+
+        {selectedProduct && (
+          <div className="product-info">
+            <p>Çmimi njësi: {Number(selectedProduct.cmimi).toFixed(2)}</p>
+            <p>Stoku aktual: {selectedProduct.sasia_stok}</p>
+          </div>
+        )}
 
         <label>
           Sasia
@@ -154,8 +210,10 @@ export default function ShitjetForm({ selected, onSaved, onCancel }) {
           <input name="data" type="date" value={form.data} onChange={handleChange} required />
         </label>
 
+        {validationError && <p className="form-error">{validationError}</p>}
+
         <div className="form-actions">
-          <button type="submit" disabled={isSaving} className="button button-primary">
+          <button type="submit" disabled={isSaving || Boolean(validationError)} className="button button-primary">
             {isSaving ? 'Duke Ruajtur...' : isEditing ? 'Ruaj Ndryshimet' : 'Regjistro Shitjen'}
           </button>
           {isEditing && (
