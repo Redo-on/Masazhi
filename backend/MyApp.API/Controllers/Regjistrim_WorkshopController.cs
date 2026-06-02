@@ -16,14 +16,12 @@ namespace MyApp.API.Controllers
             _context = context;
         }
 
-        // GET: api/Regjistrim_Workshop
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Regjistrimi_Workshop>>> GetRegjistrimet()
         {
             return await _context.Regjistrimet_Workshop.ToListAsync();
         }
 
-        // GET: api/Regjistrim_Workshop/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Regjistrimi_Workshop>> GetRegjistrim(int id)
         {
@@ -37,7 +35,6 @@ namespace MyApp.API.Controllers
             return regjistrim;
         }
 
-        // POST: api/Regjistrim_Workshop
         [HttpPost]
         public async Task<ActionResult<Regjistrimi_Workshop>> PostRegjistrim(Regjistrimi_Workshop regjistrim)
         {
@@ -47,7 +44,6 @@ namespace MyApp.API.Controllers
             return CreatedAtAction(nameof(GetRegjistrim), new { id = regjistrim.rw_id }, regjistrim);
         }
 
-        // PUT: api/Regjistrim_Workshop/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutRegjistrim(int id, Regjistrimi_Workshop regjistrim)
         {
@@ -78,7 +74,7 @@ namespace MyApp.API.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Regjistrim_Workshop/5
+        
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRegjistrim(int id)
         {

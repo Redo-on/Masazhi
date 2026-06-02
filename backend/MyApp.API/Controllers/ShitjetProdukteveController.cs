@@ -1,54 +1,74 @@
+using System.Numerics;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Application.Interfaces;
+using MyApp.Application.Services;
 using MyApp.Domain;
 
 namespace MyApp.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]")] // This routes exactly to /api/ShitjetProdukteve as expected by React
 public class ShitjetProdukteveController : ControllerBase
 {
-    private readonly IShitjetProdukteveService _service;
+    private readonly IShitjetProdukteveService _shitjetService;
 
-    public ShitjetProdukteveController(IShitjetProdukteveService service)
+    public ShitjetProdukteveController(IShitjetProdukteveService shitjetService)
     {
-        _service = service;
+        _shitjetService = shitjetService;
     }
 
+    // GET: api/ShitjetProdukteve
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Shitjet_Produkteve>>> GetShitjetProdukteve()
+    public async Task<IActionResult> GetAll()
     {
-        var result = await _service.GetAllAsync();
-        return Ok(result);
+        var sales = await _shitjetService.GetAllAsync();
+        return Ok(sales);
     }
 
+    // GET: api/ShitjetProdukteve/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Shitjet_Produkteve>> GetShitjetProdukteve(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-        var result = await _service.GetByIdAsync(id);
-        if (result == null) return NotFound();
-        return Ok(result);
+        var sale = await _shitjetService.GetByIdAsync(id);
+        if (sale == null) return NotFound();
+        return Ok(sale);
     }
 
+    // POST: api/ShitjetProdukteve
     [HttpPost]
-    public async Task<ActionResult<Shitjet_Produkteve>> CreateShitjetProdukteve(Shitjet_Produkteve shitje)
+    public async Task<IActionResult> Create([FromBody] Shitjet_Produkteve shitje)
     {
-        var created = await _service.CreateAsync(shitje);
-        return CreatedAtAction(nameof(GetShitjetProdukteve), new { id = created.shitje_id }, created);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var created = await _shitjetService.CreateAsync(shitje);
+        return CreatedAtAction(nameof(GetById), new { id = created.shitje_id }, created);
     }
 
+    // PUT: api/ShitjetProdukteve/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateShitjetProdukteve(int id, Shitjet_Produkteve shitje)
+    public async Task<IActionResult> Update(int id, [FromBody] Shitjet_Produkteve shitje)
     {
-        if (id != shitje.shitje_id) return BadRequest("ID mismatch");
-        await _service.UpdateAsync(shitje);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var updated = await _shitjetService.UpdateAsync(id, shitje);
+        if (!updated) return NotFound();
+
         return NoContent();
     }
 
+    // DELETE: api/ShitjetProdukteve/5
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteShitjetProdukteve(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        await _service.DeleteAsync(id);
+        var deleted = await _shitjetService.DeleteAsync(id);
+        if (!deleted) return NotFound();
+
         return NoContent();
     }
 }

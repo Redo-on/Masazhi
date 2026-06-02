@@ -9,12 +9,18 @@ namespace MyApp.API.Controllers
     public class AnetaretController : ControllerBase
     {
         private readonly IAnetaretService _anetaretService;
+    private readonly IRegjistrimetService _regjistrimetService;
+    private readonly IPagesatService _pagesatService;
 
-        
-        public AnetaretController(IAnetaretService anetaretService)
-        {
-            _anetaretService = anetaretService;
-        }
+    public AnetaretController(
+        IAnetaretService anetaretService, 
+        IRegjistrimetService regjistrimetService, 
+        IPagesatService pagesatService)
+    {
+        _anetaretService = anetaretService;
+        _regjistrimetService = regjistrimetService;
+        _pagesatService = pagesatService;
+    }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Anetaret>>> GetAnetaret()
@@ -55,28 +61,33 @@ namespace MyApp.API.Controllers
         }
 
         // 5. Registration Endpoints (Regjistrimet)
-        [HttpGet("regjistrimet")]
-        public ActionResult<IEnumerable<Regjistrimet>> GetRegjistrimet()
-        {
-            return Ok(new List<Regjistrimet>());
-        }
+    [HttpGet("regjistrimet")]
+    public async Task<ActionResult<IEnumerable<Regjistrimet>>> GetRegjistrimet()
+    {
+        var regjistrimet = await _regjistrimetService.GetAllAsync();
+        return Ok(regjistrimet);
+    }
 
-        [HttpPost("regjistrimet")]
-        public ActionResult<Regjistrimet> CreateRegjistrimet(Regjistrimet regjistrim)
-        {
-            return CreatedAtAction(nameof(GetRegjistrimet), new { id = regjistrim.regjistrim_id }, regjistrim);
-        }
+    [HttpPost("regjistrimet")]
+    public async Task<ActionResult<Regjistrimet>> CreateRegjistrimet(Regjistrimet regjistrim)
+    {
+        var createdRegjistrim = await _regjistrimetService.CreateAsync(regjistrim);
+        return CreatedAtAction(nameof(GetRegjistrimet), new { id = createdRegjistrim.regjistrim_id }, createdRegjistrim);
+    }
 
-        // 6. Payment Endpoints (Pagesat)
-        [HttpGet("pagesat")]
-        public ActionResult<IEnumerable<Pagesat>> GetPagesat()
-        {
-            return Ok(new List<Pagesat>());
-        }
+    // 6. Payment Endpoints (Pagesat)
+    [HttpGet("pagesat")]
+    public async Task<ActionResult<IEnumerable<Pagesat>>> GetPagesat()
+    {
+        var pagesat = await _pagesatService.GetAllAsync();
+        return Ok(pagesat);
+    }
 
-        [HttpPost("pagesat")]
-        public ActionResult<Pagesat> CreatePagesat(Pagesat pagesa)
-        {
-            return CreatedAtAction(nameof(GetPagesat), new { id = pagesa.pagese_id }, pagesa);
+    [HttpPost("pagesat")]
+    public async Task<ActionResult<Pagesat>> CreatePagesat(Pagesat pagesa)
+    {
+        var createdPagesa = await _pagesatService.CreateAsync(pagesa);
+        return CreatedAtAction(nameof(GetPagesat), new { id = createdPagesa.pagese_id }, createdPagesa);
         }
     }
+}

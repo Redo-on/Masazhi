@@ -27,7 +27,7 @@ builder.Services.AddScoped<IWorkshopService, WorkshopService>();
 builder.Services.AddScoped<IRegjistrimiWorkshopService, RegjistrimiWorkshopService>();
 builder.Services.AddScoped<IAnetaresimetService, AnetaresimetService>();
 builder.Services.AddScoped<IPagesatService, PagesatService>();
-
+builder.Services.AddScoped<IShitjetProdukteveService, ShitjetProdukteveService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
