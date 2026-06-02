@@ -50,6 +50,25 @@ public class ShitjetProdukteveService : IShitjetProdukteveService
 
     public async Task<Shitjet_Produkteve> CreateAsync(Shitjet_Produkteve shitje)
     {
+        var produkt = await _context.Produktet.FirstOrDefaultAsync(p => p.produkti_id == shitje.produkti_id);
+        if (produkt == null)
+        {
+            throw new InvalidOperationException("Produkt not found.");
+        }
+
+        if (shitje.sasia <= 0)
+        {
+            throw new InvalidOperationException("Sasia e shitjes duhet të jetë më e madhe se zero.");
+        }
+
+        if (produkt.sasia_stok < shitje.sasia)
+        {
+            throw new InvalidOperationException("Nuk ka stok të mjaftueshëm për këtë shitje.");
+        }
+
+        produkt.sasia_stok -= shitje.sasia;
+        _context.Produktet.Update(produkt);
+
         _context.Shitjet_Produkteve.Add(shitje);
         await _context.SaveChangesAsync();
         return shitje;

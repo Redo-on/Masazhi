@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 
-var connectionString = "Server=localhost;Database=YogaCenterDB;User=root;Password=;";
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));

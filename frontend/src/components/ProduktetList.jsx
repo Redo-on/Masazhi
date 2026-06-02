@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 export default function ProduktetList({ refreshKey, onEdit }) {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
 
   const loadProducts = async () => {
     setLoading(true)
@@ -18,6 +19,20 @@ export default function ProduktetList({ refreshKey, onEdit }) {
       setLoading(false)
     }
   }
+
+  const filteredProducts = useMemo(
+    () =>
+      products.filter((produkt) => {
+        const query = search.trim().toLowerCase()
+        if (!query) return true
+        return (
+          produkt.emri?.toLowerCase().includes(query) ||
+          produkt.kategoria?.toLowerCase().includes(query) ||
+          produkt.pershkrimi?.toLowerCase().includes(query)
+        )
+      }),
+    [products, search],
+  )
 
   useEffect(() => {
     loadProducts()
@@ -41,14 +56,27 @@ export default function ProduktetList({ refreshKey, onEdit }) {
   return (
     <section className="card list-card">
       <div className="list-header">
-        <h2>Produktet</h2>
-        <span>{products.length} produkte të gjetura</span>
+        <div>
+          <h2>Produktet</h2>
+          <p className="list-note">Menaxhoni produktet dhe filtroni me kërkim.</p>
+        </div>
+        <span>{filteredProducts.length} produkte të gjetura</span>
+      </div>
+
+      <div className="list-toolbar">
+        <input
+          type="search"
+          className="search-input"
+          placeholder="Kërko produkt sipas emrit, kategorisë ose përshkrimit"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
       </div>
 
       {loading ? (
         <p className="loading">Duke ngarkuar produktet...</p>
-      ) : products.length === 0 ? (
-        <p className="empty-state">Nuk ka produkte të regjistruara.</p>
+      ) : filteredProducts.length === 0 ? (
+        <p className="empty-state">Nuk u gjet asnjë produkt me këtë kriter.</p>
       ) : (
         <div className="table-responsive">
           <table>
@@ -62,7 +90,7 @@ export default function ProduktetList({ refreshKey, onEdit }) {
               </tr>
             </thead>
             <tbody>
-              {products.map((produkt) => (
+              {filteredProducts.map((produkt) => (
                 <tr key={produkt.produkti_id}>
                   <td>{produkt.emri}</td>
                   <td>{produkt.kategoria}</td>

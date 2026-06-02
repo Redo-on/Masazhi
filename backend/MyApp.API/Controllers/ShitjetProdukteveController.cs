@@ -38,14 +38,16 @@ public class ShitjetProdukteveController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] Shitjet_Produkteve shitje)
     {
-        if (!ModelState.IsValid)
+       try
         {
-            return BadRequest(ModelState);
+            var created = await _shitjetService.CreateAsync(shitje);
+            
+            return CreatedAtAction(nameof(GetById), new { id = created.shitje_id }, created);
         }
-
-        var created = await _shitjetService.CreateAsync(shitje);
-        return CreatedAtAction(nameof(GetById), new { id = created.shitje_id }, created);
-    }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
 
     // PUT: api/ShitjetProdukteve/5
     [HttpPut("{id}")]
