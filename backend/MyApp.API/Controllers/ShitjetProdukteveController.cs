@@ -33,8 +33,15 @@ public class ShitjetProdukteveController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Shitjet_Produkteve>> CreateShitjetProdukteve(Shitjet_Produkteve shitje)
     {
-        var created = await _service.CreateAsync(shitje);
-        return CreatedAtAction(nameof(GetShitjetProdukteve), new { id = created.shitje_id }, created);
+        try
+        {
+            var created = await _service.CreateAsync(shitje);
+            return CreatedAtAction(nameof(GetShitjetProdukteve), new { id = created.shitje_id }, created);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpPut("{id}")]

@@ -24,6 +24,11 @@ public class ProduktetService : IProduktetService
         return await _context.Produktet.FirstOrDefaultAsync(p => p.produkti_id == id);
     }
 
+    public async Task<Produktet?> GetByNameAndCategoryAsync(string emri, string kategoria)
+    {
+        return await _context.Produktet.FirstOrDefaultAsync(p => p.emri == emri && p.kategoria == kategoria);
+    }
+
     public async Task<Produktet> CreateAsync(Produktet produktet)
     {
         _context.Produktet.Add(produktet);
