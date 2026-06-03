@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 const emptyRegjistrim = {
   anetar_id: '',
@@ -14,13 +16,18 @@ export default function RegjistrimetForm({ onSaved }) {
   const [oraret, setOraret] = useState([])
   const [isSaving, setIsSaving] = useState(false)
   const [validationError, setValidationError] = useState('')
+  const navigate = useNavigate()
 
   useEffect(() => {
     setForm(emptyRegjistrim)
 
     const loadMembers = async () => {
       try {
-        const response = await fetch('/api/Anetaret')
+        const response = await authorizedFetch('/api/Anetaret')
+        if (response.status === 401) {
+          navigate('/login', { replace: true })
+          return
+        }
         if (!response.ok) throw new Error('Could not load members')
         setMembers(await response.json())
       } catch (error) {
@@ -31,7 +38,11 @@ export default function RegjistrimetForm({ onSaved }) {
 
     const loadOraret = async () => {
       try {
-        const response = await fetch('/api/Orari')
+        const response = await authorizedFetch('/api/Orari')
+        if (response.status === 401) {
+          navigate('/login', { replace: true })
+          return
+        }
         if (!response.ok) throw new Error('Could not load oraret')
         setOraret(await response.json())
       } catch (error) {
@@ -72,11 +83,16 @@ export default function RegjistrimetForm({ onSaved }) {
 
     setIsSaving(true)
     try {
-      const response = await fetch('/api/Anetaret/regjistrimet', {
+      const response = await authorizedFetch('/api/Anetaret/regjistrimet', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
+
+      if (response.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
 
       if (!response.ok) {
         throw new Error('Failed to save registration')

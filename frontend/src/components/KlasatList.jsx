@@ -1,13 +1,21 @@
 import { useEffect, useState } from 'react'
+import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 export default function KlasatList({ refreshKey }) {
   const [classes, setClasses] = useState([])
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
   const loadClasses = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/Klasat')
+      const response = await authorizedFetch('/api/Klasat')
+      if (response.status === 401) {
+        // Redirect to login if unauthorized
+        navigate('/login', { replace: true })
+        return
+      }
       if (!response.ok) throw new Error('Could not load classes')
       setClasses(await response.json())
     } catch (error) {

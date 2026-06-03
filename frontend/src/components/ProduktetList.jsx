@@ -1,14 +1,21 @@
 import { useEffect, useMemo, useState } from 'react'
+import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 export default function ProduktetList({ refreshKey, onEdit }) {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const navigate = useNavigate()
 
   const loadProducts = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/Produktet')
+      const response = await authorizedFetch('/api/Produktet')
+      if (response.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
       if (!response.ok) throw new Error('Could not load products')
       const data = await response.json()
       setProducts(data)
@@ -44,7 +51,11 @@ export default function ProduktetList({ refreshKey, onEdit }) {
     }
 
     try {
-      const response = await fetch(`/api/Produktet/${id}`, { method: 'DELETE' })
+      const response = await authorizedFetch(`/api/Produktet/${id}`, { method: 'DELETE' })
+      if (response.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
       if (!response.ok) throw new Error('Delete request failed')
       await loadProducts()
     } catch (error) {

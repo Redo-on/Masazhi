@@ -1,13 +1,20 @@
 import { useEffect, useState } from 'react'
+import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 export default function RegjistrimetList({ refreshKey }) {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
   const loadRegjistrimet = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/Anetaret/regjistrimet')
+      const response = await authorizedFetch('/api/Anetaret/regjistrimet')
+      if (response.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
       if (!response.ok) throw new Error('Could not load registrations')
       setItems(await response.json())
     } catch (error) {

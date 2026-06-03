@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 const emptyInstructor = {
   emri: '',
@@ -17,6 +19,7 @@ export default function InstruktoretForm({ onSaved }) {
   const [form, setForm] = useState(emptyInstructor);
   const [isSaving, setIsSaving] = useState(false);
   const [validationError, setValidationError] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -61,13 +64,19 @@ export default function InstruktoretForm({ onSaved }) {
     };
 
     try {
-      const response = await fetch('/api/Instruktoret', {
+      const response = await authorizedFetch('/api/Instruktoret', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
       });
+
+      if (response.status === 401) {
+        // Redirect to login if unauthorized
+        navigate('/login', { replace: true })
+        return
+      }
 
       if (response.ok) {
         alert("Instruktori u shtua me sukses!");
@@ -88,7 +97,7 @@ export default function InstruktoretForm({ onSaved }) {
     <section className="card form-card">
       <h2>Shto Instruktor të Ri</h2>
       <form onSubmit={handleSubmit} className="form-grid">
-        
+         
         <label>
           Emri
           <input name="emri" type="text" value={form.emri} onChange={handleChange} required />

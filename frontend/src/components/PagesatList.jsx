@@ -1,13 +1,20 @@
 import { useEffect, useState } from 'react'
+import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 export default function PagesatList({ refreshKey }) {
   const [payments, setPayments] = useState([])
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
   const loadPagesat = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/Anetaret/pagesat')
+      const response = await authorizedFetch('/api/Anetaret/pagesat')
+      if (response.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
       if (!response.ok) throw new Error('Could not load payments')
       setPayments(await response.json())
     } catch (error) {

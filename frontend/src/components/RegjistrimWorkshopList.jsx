@@ -1,13 +1,20 @@
 import { useEffect, useState } from 'react'
+import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 export default function RegjistrimWorkshopList({ refreshKey, onEdit }) {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
   const loadRegistrations = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/RegjistrimWorkshop')
+      const response = await authorizedFetch('/api/RegjistrimWorkshop')
+      if (response.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
       if (!response.ok) throw new Error('Could not load workshop registrations')
       setItems(await response.json())
     } catch (error) {
@@ -28,7 +35,11 @@ export default function RegjistrimWorkshopList({ refreshKey, onEdit }) {
     }
 
     try {
-      const response = await fetch(`/api/RegjistrimWorkshop/${id}`, { method: 'DELETE' })
+      const response = await authorizedFetch(`/api/RegjistrimWorkshop/${id}`, { method: 'DELETE' })
+      if (response.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
       if (!response.ok) throw new Error('Delete request failed')
       await loadRegistrations()
     } catch (error) {

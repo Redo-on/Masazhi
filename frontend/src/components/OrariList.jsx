@@ -1,14 +1,21 @@
 import { useEffect, useMemo, useState } from 'react'
+import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 export default function OrariList({ refreshKey, onEdit }) {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const navigate = useNavigate()
 
   const loadItems = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/Orari')
+      const response = await authorizedFetch('/api/Orari')
+      if (response.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
       if (!response.ok) throw new Error('Could not load orari')
       const data = await response.json()
       setItems(data)
@@ -43,7 +50,11 @@ export default function OrariList({ refreshKey, onEdit }) {
     if (!window.confirm('A jeni të sigurt që dëshironi të fshini këtë orar?')) return
 
     try {
-      const response = await fetch(`/api/Orari/${id}`, { method: 'DELETE' })
+      const response = await authorizedFetch(`/api/Orari/${id}`, { method: 'DELETE' })
+      if (response.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
       if (!response.ok) throw new Error('Delete request failed')
       await loadItems()
     } catch (error) {

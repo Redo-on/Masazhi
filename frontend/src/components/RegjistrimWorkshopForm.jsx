@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 const emptyRegistration = {
   rw_id: null,
@@ -15,11 +17,16 @@ export default function RegjistrimWorkshopForm({ selected, onSaved, onCancel }) 
   const [isSaving, setIsSaving] = useState(false)
   const [validationError, setValidationError] = useState('')
   const isEditing = selected?.rw_id != null
+  const navigate = useNavigate()
 
   useEffect(() => {
     const loadWorkshops = async () => {
       try {
-        const response = await fetch('/api/Workshopet')
+        const response = await authorizedFetch('/api/Workshopet')
+        if (response.status === 401) {
+          navigate('/login', { replace: true })
+          return
+        }
         if (response.ok) setWorkshops(await response.json())
       } catch (error) {
         console.error('Could not load workshops for dropdown', error)
@@ -28,7 +35,11 @@ export default function RegjistrimWorkshopForm({ selected, onSaved, onCancel }) 
 
     const loadMembers = async () => {
       try {
-        const response = await fetch('/api/Anetaret')
+        const response = await authorizedFetch('/api/Anetaret')
+        if (response.status === 401) {
+          navigate('/login', { replace: true })
+          return
+        }
         if (response.ok) setMembers(await response.json())
       } catch (error) {
         console.error('Could not load members for dropdown', error)
@@ -86,11 +97,16 @@ export default function RegjistrimWorkshopForm({ selected, onSaved, onCancel }) 
       const url = isEditing ? `/api/RegjistrimWorkshop/${form.rw_id}` : '/api/RegjistrimWorkshop'
       const method = isEditing ? 'PUT' : 'POST'
 
-      const response = await fetch(url, {
+      const response = await authorizedFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
+
+      if (response.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
 
       if (!response.ok) throw new Error('Failed to save registration')
 

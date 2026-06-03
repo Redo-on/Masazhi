@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 const emptyOrari = {
   orar_id: null,
@@ -20,11 +22,16 @@ export default function OrariForm({ selected, onSaved, onCancel }) {
   const [isSaving, setIsSaving] = useState(false)
   const [requestToken, setRequestToken] = useState(() => createToken())
   const isEditing = selected?.orar_id != null
+  const navigate = useNavigate()
 
   useEffect(() => {
     const loadKlasat = async () => {
       try {
-        const response = await fetch('/api/Klasat')
+        const response = await authorizedFetch('/api/Klasat')
+        if (response.status === 401) {
+          navigate('/login', { replace: true })
+          return
+        }
         if (response.ok) setKlasat(await response.json())
       } catch (error) {
         console.error('Could not load klasat for dropdown', error)
@@ -33,7 +40,11 @@ export default function OrariForm({ selected, onSaved, onCancel }) {
 
     const loadSallat = async () => {
       try {
-        const response = await fetch('/api/Salla')
+        const response = await authorizedFetch('/api/Salla')
+        if (response.status === 401) {
+          navigate('/login', { replace: true })
+          return
+        }
         if (response.ok) setSallat(await response.json())
       } catch (error) {
         console.error('Could not load sallat for dropdown', error)
@@ -83,11 +94,16 @@ export default function OrariForm({ selected, onSaved, onCancel }) {
       const url = isEditing ? `/api/Orari/${form.orar_id}` : '/api/Orari'
       const method = isEditing ? 'PUT' : 'POST'
 
-      const response = await fetch(url, {
+      const response = await authorizedFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
+
+      if (response.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
 
       if (!response.ok) {
         const errorText = await response.text()

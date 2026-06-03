@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 const emptyPagesa = {
   anetar_id: '',
@@ -16,11 +18,16 @@ export default function PagesatForm({ onSaved }) {
   const [anetaresimet, setAnetaresimet] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
   const [validationError, setValidationError] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadMembers = async () => {
       try {
-        const response = await fetch('/api/Anetaret');
+        const response = await authorizedFetch('/api/Anetaret');
+        if (response.status === 401) {
+          navigate('/login', { replace: true });
+          return;
+        }
         if (!response.ok) throw new Error('Could not load members');
         setMembers(await response.json());
       } catch (error) {
@@ -31,7 +38,11 @@ export default function PagesatForm({ onSaved }) {
 
     const loadSubscriptions = async () => {
       try {
-        const response = await fetch('/api/Anetaresimet');
+        const response = await authorizedFetch('/api/Anetaresimet');
+        if (response.status === 401) {
+          navigate('/login', { replace: true });
+          return;
+        }
         if (!response.ok) throw new Error('Could not load subscriptions');
         setAnetaresimet(await response.json());
       } catch (error) {
@@ -74,13 +85,18 @@ export default function PagesatForm({ onSaved }) {
     };
 
     try {
-      const response = await fetch('/api/Anetaret/pagesat', {
+      const response = await authorizedFetch('/api/Anetaret/pagesat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
       });
+
+      if (response.status === 401) {
+        navigate('/login', { replace: true });
+        return;
+      }
 
       if (response.ok) {
         alert("Pagesa u regjistrua me sukses!");
@@ -101,7 +117,7 @@ export default function PagesatForm({ onSaved }) {
     <section className="card form-card">
       <h2>Regjistro Pagesë të Re</h2>
       <form onSubmit={handleSubmit} className="form-grid">
-        
+         
         <label>
           Anëtar
           <select
@@ -169,7 +185,7 @@ export default function PagesatForm({ onSaved }) {
             {isSaving ? 'Duke Ruajtur...' : 'Regjistro Pagesë'}
           </button>
         </div>
-        
+         
       </form>
     </section>
   );

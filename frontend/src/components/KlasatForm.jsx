@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 const emptyClass = {
   emri: '',
@@ -16,11 +18,16 @@ export default function KlasatForm({ onSaved }) {
   const [instructors, setInstructors] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
   const [validationError, setValidationError] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadInstructors = async () => {
       try {
-        const response = await fetch('/api/Instruktoret');
+        const response = await authorizedFetch('/api/Instruktoret');
+        if (response.status === 401) {
+          navigate('/login', { replace: true });
+          return;
+        }
         if (!response.ok) throw new Error('Could not load instructors');
         setInstructors(await response.json());
       } catch (error) {
@@ -79,13 +86,18 @@ export default function KlasatForm({ onSaved }) {
     };
 
     try {
-      const response = await fetch('/api/Klasat', {
+      const response = await authorizedFetch('/api/Klasat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
       });
+
+      if (response.status === 401) {
+        navigate('/login', { replace: true });
+        return;
+      }
 
       if (response.ok) {
         alert("Klasa u shtua me sukses!");
@@ -106,7 +118,7 @@ export default function KlasatForm({ onSaved }) {
     <section className="card form-card">
       <h2>Shto Klasë të Re</h2>
       <form onSubmit={handleSubmit} className="form-grid">
-        
+         
         <label>
           Emri
           <input name="emri" type="text" value={form.emri} onChange={handleChange} required />
