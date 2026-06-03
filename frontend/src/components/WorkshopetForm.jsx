@@ -14,10 +14,22 @@ const emptyWorkshop = {
 
 export default function WorkshopetForm({ selected, onSaved, onCancel }) {
   const [form, setForm] = useState(emptyWorkshop)
+  const [instructors, setInstructors] = useState([])
   const [isSaving, setIsSaving] = useState(false)
   const isEditing = selected?.workshop_id != null
 
   useEffect(() => {
+    const loadInstructors = async () => {
+      try {
+        const response = await fetch('/api/Instruktoret')
+        if (response.ok) setInstructors(await response.json())
+      } catch (error) {
+        console.error('Could not load instructors for dropdown', error)
+      }
+    }
+
+    loadInstructors()
+
     if (selected) {
       setForm({
         workshop_id: selected.workshop_id,
@@ -93,8 +105,21 @@ export default function WorkshopetForm({ selected, onSaved, onCancel }) {
         </label>
 
         <label>
-          Instruktor ID
-          <input name="instruktor_id" type="number" value={form.instruktor_id} onChange={handleChange} min="1" required />
+          Instruktor
+          <select
+            name="instruktor_id"
+            value={form.instruktor_id}
+            onChange={handleChange}
+            required
+            disabled={instructors.length === 0}
+          >
+            <option value="">Zgjidh instruktor</option>
+            {instructors.map((instruktor) => (
+              <option key={instruktor.instruktor_id} value={instruktor.instruktor_id}>
+                {instruktor.emri}
+              </option>
+            ))}
+          </select>
         </label>
 
         <label>

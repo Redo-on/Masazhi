@@ -11,7 +11,9 @@ const emptyRegistration = {
 export default function RegjistrimWorkshopForm({ selected, onSaved, onCancel }) {
   const [form, setForm] = useState(emptyRegistration)
   const [workshops, setWorkshops] = useState([])
+  const [members, setMembers] = useState([])
   const [isSaving, setIsSaving] = useState(false)
+  const [validationError, setValidationError] = useState('')
   const isEditing = selected?.rw_id != null
 
   useEffect(() => {
@@ -23,7 +25,18 @@ export default function RegjistrimWorkshopForm({ selected, onSaved, onCancel }) 
         console.error('Could not load workshops for dropdown', error)
       }
     }
+
+    const loadMembers = async () => {
+      try {
+        const response = await fetch('/api/Anetaret')
+        if (response.ok) setMembers(await response.json())
+      } catch (error) {
+        console.error('Could not load members for dropdown', error)
+      }
+    }
+
     loadWorkshops()
+    loadMembers()
   }, [])
 
   useEffect(() => {
@@ -42,15 +55,24 @@ export default function RegjistrimWorkshopForm({ selected, onSaved, onCancel }) 
 
   const handleChange = (event) => {
     const { name, value } = event.target
+    setValidationError('')
     setForm((current) => ({ ...current, [name]: value }))
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    setValidationError('')
+
+    const workshopId = Number(form.workshop_id)
+    const anetarId = Number(form.anetar_id)
+    if (!workshopId || !anetarId) {
+      setValidationError('Zgjidhni një anëtar dhe një workshop të vlefshëm.')
+      return
+    }
 
     const payload = {
-      workshop_id: Number(form.workshop_id) || 0,
-      anetar_id: Number(form.anetar_id) || 0,
+      workshop_id: workshopId,
+      anetar_id: anetarId,
       data_regjistrimit: form.data_regjistrimit || new Date().toISOString(),
       statusi_pageses: form.statusi_pageses,
     }
@@ -87,8 +109,21 @@ export default function RegjistrimWorkshopForm({ selected, onSaved, onCancel }) 
       <h2>{isEditing ? 'Edito Regjistrimin në Workshop' : 'Regjistro Anëtar në Workshop'}</h2>
       <form onSubmit={handleSubmit} className="form-grid">
         <label>
-          Anëtar ID
-          <input name="anetar_id" type="number" value={form.anetar_id} onChange={handleChange} min="1" required />
+          Anëtar
+          <select
+            name="anetar_id"
+            value={form.anetar_id}
+            onChange={handleChange}
+            required
+            disabled={members.length === 0}
+          >
+            <option value="">Zgjidh anëtar</option>
+            {members.map((member) => (
+              <option key={member.anetar_id} value={member.anetar_id}>
+                {member.emri}
+              </option>
+            ))}
+          </select>
         </label>
 
         <label>
@@ -113,8 +148,10 @@ export default function RegjistrimWorkshopForm({ selected, onSaved, onCancel }) 
           <input name="statusi_pageses" value={form.statusi_pageses} onChange={handleChange} placeholder="p.sh. E paguar, Obligim" required />
         </label>
 
+        {validationError && <p className="form-error">{validationError}</p>}
+
         <div className="form-actions">
-          <button type="submit" disabled={isSaving} className="button button-primary">
+          <button type="submit" disabled={isSaving || Boolean(validationError)} className="button button-primary">
             {isSaving ? 'Duke Ruajtur...' : isEditing ? 'Ruaj Ndryshimet' : 'Regjistro'}
           </button>
           {isEditing && (

@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
 
-const emptyPagesa = {
+const emptySubscription = {
   anetar_id: '',
-  anetaresim_id: '',
-  shuma: '',
-  metoda: 'Cash',
-  data_pageses: new Date().toISOString().split('T')[0], 
-  statusi: 'E Paguar'
+  lloji: '',
+  cmimi: '',
+  data_fillimit: new Date().toISOString().split('T')[0],
+  data_mbarimit: new Date().toISOString().split('T')[0],
+  statusi: 'i Aktiv'
 };
 
-export default function PagesatForm({ onSaved }) {
-  // 2. State hooks
-  const [form, setForm] = useState(emptyPagesa);
+export default function AnetaresimetForm({ onSaved }) {
+  // State hooks
+  const [form, setForm] = useState(emptySubscription);
   const [members, setMembers] = useState([]);
-  const [anetaresimet, setAnetaresimet] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
   const [validationError, setValidationError] = useState('');
 
@@ -29,19 +28,7 @@ export default function PagesatForm({ onSaved }) {
       }
     };
 
-    const loadSubscriptions = async () => {
-      try {
-        const response = await fetch('/api/Anetaresimet');
-        if (!response.ok) throw new Error('Could not load subscriptions');
-        setAnetaresimet(await response.json());
-      } catch (error) {
-        console.error(error);
-        setAnetaresimet([]);
-      }
-    };
-
     loadMembers();
-    loadSubscriptions();
   }, []);
 
   const handleChange = (event) => {
@@ -55,26 +42,36 @@ export default function PagesatForm({ onSaved }) {
     setValidationError('');
     setIsSaving(true);
 
-    const anetarId = Number(form.anetar_id);
-    const anetaresimId = Number(form.anetaresim_id);
+    // Basic validation
+    if (!form.anetar_id) {
+      setValidationError('Ju lutem zgjidhni një anëtar.');
+      setIsSaving(false);
+      return;
+    }
 
-    if (!anetarId || !anetaresimId) {
-      setValidationError('Zgjidhni një anëtar dhe një anëtarësim të vlefshëm.');
+    if (!form.lloji.trim()) {
+      setValidationError('Lloji i abonimit është i detyrueshëm.');
+      setIsSaving(false);
+      return;
+    }
+
+    if (form.cmimi === '' || Number(form.cmimi) <= 0) {
+      setValidationError('Ju lutemi vendosni një çmim të vlefshëm.');
       setIsSaving(false);
       return;
     }
 
     const payload = {
-      anetar_id: anetarId,
-      anetaresim_id: anetaresimId,
-      shuma: Number(form.shuma) || 0,
-      metoda: form.metoda,
-      data_pageses: form.data_pageses || new Date().toISOString(),
-      statusi: form.statusi,
+      anetar_id: Number(form.anetar_id),
+      lloji: form.lloji.trim(),
+      cmimi: Number(form.cmimi),
+      data_fillimit: form.data_fillimit,
+      data_mbarimit: form.data_mbarimit,
+      statusi: form.statusi.trim()
     };
 
     try {
-      const response = await fetch('/api/Anetaret/pagesat', {
+      const response = await fetch('/api/Anetaresimet', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -83,8 +80,8 @@ export default function PagesatForm({ onSaved }) {
       });
 
       if (response.ok) {
-        alert("Pagesa u regjistrua me sukses!");
-        setForm(emptyPagesa); // Clear the form
+        alert("Abonimi u shtua me sukses!");
+        setForm(emptySubscription); // Clear the form
         if (onSaved) onSaved(); // Notify parent component if needed
       } else {
         setValidationError("Ndodhi një gabim! Kontrollo të dhënat.");
@@ -99,7 +96,7 @@ export default function PagesatForm({ onSaved }) {
 
   return (
     <section className="card form-card">
-      <h2>Regjistro Pagesë të Re</h2>
+      <h2>Shto Abonim të Ri</h2>
       <form onSubmit={handleSubmit} className="form-grid">
         
         <label>
@@ -114,59 +111,47 @@ export default function PagesatForm({ onSaved }) {
             <option value="">Zgjidh anëtar</option>
             {members.map((member) => (
               <option key={member.anetar_id} value={member.anetar_id}>
-                {member.emri}
+                {member.emri} {member.mbiemri}
               </option>
             ))}
           </select>
         </label>
 
         <label>
-          Anëtarësim
-          <select
-            name="anetaresim_id"
-            value={form.anetaresim_id}
-            onChange={handleChange}
-            required
-            disabled={anetaresimet.length === 0}
-          >
-            <option value="">Zgjidh anëtarësim</option>
-            {anetaresimet.map((item) => (
-              <option key={item.anetaresimi_id} value={item.anetaresimi_id}>
-                {item.anetaresimi_id} - {item.lloji} ({item.statusi})
-              </option>
-            ))}
-          </select>
+          Lloji
+          <input name="lloji" type="text" value={form.lloji} onChange={handleChange} required />
         </label>
 
         <label>
-          Shuma
-          <input name="shuma" type="number" value={form.shuma} onChange={handleChange} min="0" step="0.01" required />
+          Çmimi (€)
+          <input name="cmimi" type="number" value={form.cmimi} onChange={handleChange} min="0" step="0.01" required />
         </label>
 
         <label>
-          Metoda
-          <select name="metoda" value={form.metoda} onChange={handleChange} required>
-            <option value="Cash">Cash</option>
-            <option value="Karta">Karta</option>
-            <option value="Banka">Banka</option>
-          </select>
+          Data e Fillimit
+          <input name="data_fillimit" type="date" value={form.data_fillimit} onChange={handleChange} required />
         </label>
 
         <label>
-          Data Pagesës
-          <input name="data_pageses" type="date" value={form.data_pageses} onChange={handleChange} required />
+          Data e Mbarimit
+          <input name="data_mbarimit" type="date" value={form.data_mbarimit} onChange={handleChange} required />
         </label>
 
         <label>
           Statusi
-          <input name="statusi" value={form.statusi} onChange={handleChange} required />
+          <select name="statusi" value={form.statusi} onChange={handleChange} required>
+            <option value="i Aktiv">i Aktiv</option>
+            <option value="i Mbaruar">i Mbaruar</option>
+            <option value="i Anuluar">i Anuluar</option>
+            <option value="i Ndalerur">i Ndalerur</option>
+          </select>
         </label>
 
         {validationError && <p className="form-error">{validationError}</p>}
 
         <div className="form-actions">
           <button type="submit" disabled={isSaving || Boolean(validationError)} className="button button-primary">
-            {isSaving ? 'Duke Ruajtur...' : 'Regjistro Pagesë'}
+            {isSaving ? 'Duke Ruajtur...' : 'Shto Abonim'}
           </button>
         </div>
         

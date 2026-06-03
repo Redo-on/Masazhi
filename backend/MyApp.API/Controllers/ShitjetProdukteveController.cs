@@ -48,6 +48,7 @@ public class ShitjetProdukteveController : ControllerBase
         {
             return BadRequest(new { message = ex.Message });
         }
+    }
 
     // PUT: api/ShitjetProdukteve/5
     [HttpPut("{id}")]
