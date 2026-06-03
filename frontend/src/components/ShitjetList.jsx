@@ -1,14 +1,21 @@
 import { useEffect, useMemo, useState } from 'react'
+import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 export default function ShitjetList({ refreshKey, onEdit }) {
   const [sales, setSales] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const navigate = useNavigate()
 
   const loadSales = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/ShitjetProdukteve')
+      const response = await authorizedFetch('/api/ShitjetProdukteve')
+      if (response.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
       if (!response.ok) throw new Error('Could not load sales')
       setSales(await response.json())
     } catch (error) {
@@ -46,7 +53,11 @@ export default function ShitjetList({ refreshKey, onEdit }) {
     }
 
     try {
-      const response = await fetch(`/api/ShitjetProdukteve/${id}`, { method: 'DELETE' })
+      const response = await authorizedFetch(`/api/ShitjetProdukteve/${id}`, { method: 'DELETE' })
+      if (response.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
       if (!response.ok) throw new Error('Delete request failed')
       await loadSales()
     } catch (error) {

@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 const emptyWorkshop = {
   workshop_id: null,
@@ -17,11 +19,16 @@ export default function WorkshopetForm({ selected, onSaved, onCancel }) {
   const [instructors, setInstructors] = useState([])
   const [isSaving, setIsSaving] = useState(false)
   const isEditing = selected?.workshop_id != null
+  const navigate = useNavigate()
 
   useEffect(() => {
     const loadInstructors = async () => {
       try {
-        const response = await fetch('/api/Instruktoret')
+        const response = await authorizedFetch('/api/Instruktoret')
+        if (response.status === 401) {
+          navigate('/login', { replace: true })
+          return
+        }
         if (response.ok) setInstructors(await response.json())
       } catch (error) {
         console.error('Could not load instructors for dropdown', error)
@@ -29,7 +36,9 @@ export default function WorkshopetForm({ selected, onSaved, onCancel }) {
     }
 
     loadInstructors()
+  }, [])
 
+  useEffect(() => {
     if (selected) {
       setForm({
         workshop_id: selected.workshop_id,
@@ -75,11 +84,16 @@ export default function WorkshopetForm({ selected, onSaved, onCancel }) {
       const url = isEditing ? `/api/Workshopet/${form.workshop_id}` : '/api/Workshopet'
       const method = isEditing ? 'PUT' : 'POST'
 
-      const response = await fetch(url, {
+      const response = await authorizedFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
+
+      if (response.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
 
       if (!response.ok) {
         throw new Error('Failed to save workshop')

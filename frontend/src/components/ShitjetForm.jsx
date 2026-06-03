@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 const emptySale = {
   shitje_id: null,
@@ -16,11 +18,16 @@ export default function ShitjetForm({ selected, onSaved, onCancel }) {
   const [isSaving, setIsSaving] = useState(false)
   const [validationError, setValidationError] = useState('')
   const isEditing = selected?.shitje_id != null
+  const navigate = useNavigate()
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const response = await fetch('/api/Produktet')
+        const response = await authorizedFetch('/api/Produktet')
+        if (response.status === 401) {
+          navigate('/login', { replace: true })
+          return
+        }
         if (!response.ok) throw new Error('Could not load products')
         setProducts(await response.json())
       } catch (error) {
@@ -31,7 +38,11 @@ export default function ShitjetForm({ selected, onSaved, onCancel }) {
 
     const loadMembers = async () => {
       try {
-        const response = await fetch('/api/Anetaret')
+        const response = await authorizedFetch('/api/Anetaret')
+        if (response.status === 401) {
+          navigate('/login', { replace: true })
+          return
+        }
         if (!response.ok) throw new Error('Could not load members')
         setMembers(await response.json())
       } catch (error) {
@@ -126,11 +137,16 @@ export default function ShitjetForm({ selected, onSaved, onCancel }) {
 
     setIsSaving(true)
     try {
-      const response = await fetch(url, {
+      const response = await authorizedFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
+
+      if (response.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
 
       if (!response.ok) {
         const errorText = await response.text()

@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 const emptySalla = {
   salla_id: null,
@@ -16,6 +18,7 @@ export default function SallatForm({ selected, onSaved, onCancel }) {
   const [isSaving, setIsSaving] = useState(false)
   const [requestToken, setRequestToken] = useState(() => createToken())
   const isEditing = selected?.salla_id != null
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (selected) {
@@ -54,11 +57,16 @@ export default function SallatForm({ selected, onSaved, onCancel }) {
       const url = isEditing ? `/api/Salla/${form.salla_id}` : '/api/Salla'
       const method = isEditing ? 'PUT' : 'POST'
 
-      const response = await fetch(url, {
+      const response = await authorizedFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
+
+      if (response.status === 401) {
+        navigate('/login', { replace: true })
+        return
+      }
 
       if (!response.ok) {
         const errorText = await response.text()
