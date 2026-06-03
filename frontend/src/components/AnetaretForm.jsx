@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 const emptyMember = {
   emri: '',
@@ -18,6 +20,7 @@ export default function AnetaretForm({ onSaved }) {
   const [form, setForm] = useState(emptyMember);
   const [isSaving, setIsSaving] = useState(false);
   const [validationError, setValidationError] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -57,13 +60,19 @@ export default function AnetaretForm({ onSaved }) {
     };
 
     try {
-      const response = await fetch('/api/Anetaret', {
+      const response = await authorizedFetch('/api/Anetaret', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
       });
+
+      if (response.status === 401) {
+        // Redirect to login if unauthorized
+        navigate('/login', { replace: true })
+        return
+      }
 
       if (response.ok) {
         alert("Anëtar'i u shtua me sukses!");

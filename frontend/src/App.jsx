@@ -1,101 +1,38 @@
-import { useState } from 'react'
-import './App.css'
-import ProduktetForm from './components/ProduktetForm.jsx'
-import ProduktetList from './components/ProduktetList.jsx'
-import RegjistrimetForm from './components/RegjistrimetForm.jsx'
-import RegjistrimetList from './components/RegjistrimetList.jsx'
-import PagesatForm from './components/PagesatForm.jsx'
-import PagesatList from './components/PagesatList.jsx'
-import ShitjetForm from './components/ShitjetForm.jsx'
-import ShitjetList from './components/ShitjetList.jsx'
-import OrariForm from './components/OrariForm.jsx'
-import OrariList from './components/OrariList.jsx'
-import SallatForm from './components/SallatForm.jsx'
-import SallatList from './components/SallatList.jsx'
-import WorkshopetForm from './components/WorkshopetForm.jsx'
-import WorkshopetList from './components/WorkshopetList.jsx'
-import RegjistrimWorkshopForm from './components/RegjistrimWorkshopForm.jsx'
-import RegjistrimWorkshopList from './components/RegjistrimWorkshopList.jsx'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
+import './App.css';
+import { AuthProvider } from './contexts/AuthContext';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import ProtectedRoute from './components/ProtectedRoute';
+// Import entity lists and forms
+import AnetaretList from './components/AnetaretList';
+import AnetaretForm from './components/AnetaretForm';
+import InstruktoretList from './components/InstruktoretList';
+import InstruktoretForm from './components/InstruktoretForm';
+import KlasatList from './components/KlasatList';
+import KlasatForm from './components/KlasatForm';
+import AnetaresimetList from './components/AnetaresimetList';
+import AnetaresimetForm from './components/AnetaresimetForm';
+import PagesatList from './components/PagesatList';
+import PagesatForm from './components/PagesatForm';
+import OrariList from './components/OrariList';
+import OrariForm from './components/OrariForm';
+import ProduktetList from './components/ProduktetList';
+import ProduktetForm from './components/ProduktetForm';
+import RegjistrimetList from './components/RegjistrimetList';
+import RegjistrimetForm from './components/RegjistrimetForm';
+import RegjistrimWorkshopList from './components/RegjistrimWorkshopList';
+import RegjistrimWorkshopForm from './components/RegjistrimWorkshopForm';
+import SallatList from './components/SallatList';
+import SallatForm from './components/SallatForm';
+import ShitjetList from './components/ShitjetList';
+import ShitjetForm from './components/ShitjetForm';
+import WorkshopetList from './components/WorkshopetList';
+import WorkshopetForm from './components/WorkshopetForm';
 
-function App() {
-  const [activeView, setActiveView] = useState('products')
-  const [productRefreshKey, setProductRefreshKey] = useState(0)
-  const [saleRefreshKey, setSaleRefreshKey] = useState(0)
-  const [registrationRefreshKey, setRegistrationRefreshKey] = useState(0)
-  const [paymentRefreshKey, setPaymentRefreshKey] = useState(0)
-  const [orariRefreshKey, setOrariRefreshKey] = useState(0)
-  const [sallaRefreshKey, setSallaRefreshKey] = useState(0)
-  const [workshopRefreshKey, setWorkshopRefreshKey] = useState(0)
-  const [regjistrimWorkshopRefreshKey, setRegjistrimWorkshopRefreshKey] = useState(0)
-  const [selectedProduct, setSelectedProduct] = useState(null)
-  const [selectedSale, setSelectedSale] = useState(null)
-  const [selectedOrar, setSelectedOrar] = useState(null)
-  const [selectedSalla, setSelectedSalla] = useState(null)
-  const [selectedWorkshop, setSelectedWorkshop] = useState(null)
-  const [selectedRegjistrimWorkshop, setSelectedRegjistrimWorkshop] = useState(null)
-
-  const handleProductSaved = () => {
-    setSelectedProduct(null)
-    setProductRefreshKey((prev) => prev + 1)
-  }
-
-  const handleSaleSaved = () => {
-    setSelectedSale(null)
-    setSaleRefreshKey((prev) => prev + 1)
-  }
-
-  const handleWorkshopSaved = () => {
-    setSelectedWorkshop(null)
-    setWorkshopRefreshKey((prev) => prev + 1)
-  }
-
-  const handleRegjistrimWorkshopSaved = () => {
-    setSelectedRegjistrimWorkshop(null)
-    setRegjistrimWorkshopRefreshKey((prev) => prev + 1)
-  }
-
-  const handleRegjistrimSaved = () => {
-    setRegistrationRefreshKey((prev) => prev + 1)
-  }
-
-  const handlePagesaSaved = () => {
-    setPaymentRefreshKey((prev) => prev + 1)
-  }
-
-  const pageTitle =
-    activeView === 'products'
-      ? 'Produktet'
-      : activeView === 'sallat'
-      ? 'Sallat'
-      : activeView === 'orari'
-      ? 'Orari'
-      : activeView === 'workshops'
-      ? 'Workshopet'
-      : activeView === 'regjistrimworkshop'
-      ? 'Regjistrimet Workshop'
-      : activeView === 'sales'
-      ? 'Shitjet e Produkteve'
-      : activeView === 'regjistrime'
-      ? 'Regjistrimet'
-      : 'Pagesat'
-
-  const pageSubtitle =
-    activeView === 'products'
-      ? 'Menaxhoni produktet e qendrës suaj të meditimit dhe ruani artikujt në stok.'
-      : activeView === 'sallat'
-      ? 'Menaxhoni sallat, kapacitetin dhe pajisjet.'
-      : activeView === 'orari'
-      ? 'Menaxhoni oraret e klasave, sallat dhe kohët e tyre.'
-      : activeView === 'workshops'
-      ? 'Menaxhoni workshop-et, instruktorët dhe regjistrimet e tyre.'
-      : activeView === 'regjistrimworkshop'
-      ? 'Menaxhoni regjistrimet e anëtarëve në workshop-e.'
-      : activeView === 'sales'
-      ? 'Regjistroni shitjet e produkteve dhe ndiqni transaksionet me anëtarët.'
-      : activeView === 'regjistrime'
-      ? 'Regjistroni anëtarët në oraret e klasave dhe ndiqni statusin e regjistrimit.'
-      : 'Menaxhoni pagesat e anëtarëve dhe ndiqni transaksionet për abonimet dhe regjistrimet.'
-
+const DashboardLayout = () => {
+  const navigate = useNavigate();
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -110,161 +47,249 @@ function App() {
         <div className="nav-section">
           <p className="nav-title">Navigimi</p>
           <nav className="sidebar-nav">
-            <button
-              className={activeView === 'products' ? 'nav-button active' : 'nav-button'}
-              onClick={() => setActiveView('products')}
-            >
-              Produktet
-            </button>
-            <button
-              className={activeView === 'orari' ? 'nav-button active' : 'nav-button'}
-              onClick={() => setActiveView('orari')}
-            >
-              Orari
-            </button>
-            <button
-              className={activeView === 'workshops' ? 'nav-button active' : 'nav-button'}
-              onClick={() => setActiveView('workshops')}
-            >
-              Workshopet
-            </button>
-            <button
-              className={activeView === 'regjistrimworkshop' ? 'nav-button active' : 'nav-button'}
-              onClick={() => setActiveView('regjistrimworkshop')}
-            >
-              Regjistrime Workshop
-            </button>
-            <button
-              className={activeView === 'sallat' ? 'nav-button active' : 'nav-button'}
-              onClick={() => setActiveView('sallat')}
-            >
-              Sallat
-            </button>
-            <button
-              className={activeView === 'sales' ? 'nav-button active' : 'nav-button'}
-              onClick={() => setActiveView('sales')}
-            >
-              Shitjet e Produkteve
-            </button>
-            <button
-              className={activeView === 'regjistrime' ? 'nav-button active' : 'nav-button'}
-              onClick={() => setActiveView('regjistrime')}
-            >
-              Regjistrimet
-            </button>
-            <button
-              className={activeView === 'pagesat' ? 'nav-button active' : 'nav-button'}
-              onClick={() => setActiveView('pagesat')}
-            >
+            <Link to="/anetaret" className="nav-button">
+              Anetarët
+            </Link>
+            <Link to="/instruktoret" className="nav-button">
+              Instruktorët
+            </Link>
+            <Link to="/klasat" className="nav-button">
+              Klasat
+            </Link>
+            <Link to="/anetaresimet" className="nav-button">
+              Anetarësimet
+            </Link>
+            <Link to="/pagesat" className="nav-button">
               Pagesat
-            </button>
+            </Link>
+            <Link to="/orari" className="nav-button">
+              Orari
+            </Link>
+            <Link to="/produktet" className="nav-button">
+              Produktet
+            </Link>
+            <Link to="/regjistrimet" className="nav-button">
+              Regjistrimet
+            </Link>
+            <Link to="/regjirimworkshop" className="nav-button">
+              Regjistrim Workshop
+            </Link>
+            <Link to="/sallat" className="nav-button">
+              Sallat
+            </Link>
+            <Link to="/shitjet" className="nav-button">
+              Shitjet
+            </Link>
+            <Link to="/workshopet" className="nav-button">
+              Workshopet
+            </Link>
           </nav>
         </div>
       </aside>
 
       <main className="main-content">
-        <div className="page-header">
-          <div>
-            <p className="eyebrow">Dashboard</p>
-            <h1>{pageTitle}</h1>
-            <p className="page-copy">{pageSubtitle}</p>
-          </div>
-          <div className="header-actions">
-            <button
-              className={activeView === 'products' ? 'button button-secondary active-pill' : 'button button-secondary muted'}
-              onClick={() => setActiveView('products')}
-            >
-              Produktet
-            </button>
-            <button
-              className={activeView === 'sales' ? 'button button-secondary active-pill' : 'button button-secondary muted'}
-              onClick={() => setActiveView('sales')}
-            >
-              Shitjet
-            </button>
-            <button
-              className={activeView === 'orari' ? 'button button-secondary active-pill' : 'button button-secondary muted'}
-              onClick={() => setActiveView('orari')}
-            >
-              Orari
-            </button>
-            <button
-              className={activeView === 'workshops' ? 'button button-secondary active-pill' : 'button button-secondary muted'}
-              onClick={() => setActiveView('workshops')}
-            >
-              Workshopet
-            </button>
-            <button
-              className={activeView === 'regjistrimworkshop' ? 'button button-secondary active-pill' : 'button button-secondary muted'}
-              onClick={() => setActiveView('regjistrimworkshop')}
-            >
-              Regjistrime Workshop
-            </button>
-            <button
-              className={activeView === 'sallat' ? 'button button-secondary active-pill' : 'button button-secondary muted'}
-              onClick={() => setActiveView('sallat')}
-            >
-              Sallat
-            </button>
-            <button
-              className={activeView === 'regjistrime' ? 'button button-secondary active-pill' : 'button button-secondary muted'}
-              onClick={() => setActiveView('regjistrime')}
-            >
-              Regjistrimet
-            </button>
-            <button
-              className={activeView === 'pagesat' ? 'button button-secondary active-pill' : 'button button-secondary muted'}
-              onClick={() => setActiveView('pagesat')}
-            >
-              Pagesat
-            </button>
-          </div>
-        </div>
-
-        <div className="content-grid">
-          <section className="content-main">
-            {activeView === 'products' ? (
-              <ProduktetList refreshKey={productRefreshKey} onEdit={setSelectedProduct} />
-            ) : activeView === 'sallat' ? (
-              <SallatList refreshKey={sallaRefreshKey} onEdit={setSelectedSalla} />
-            ) : activeView === 'orari' ? (
-              <OrariList refreshKey={orariRefreshKey} onEdit={setSelectedOrar} />
-            ) : activeView === 'workshops' ? (
-              <WorkshopetList refreshKey={workshopRefreshKey} onEdit={setSelectedWorkshop} />
-            ) : activeView === 'regjistrimworkshop' ? (
-              <RegjistrimWorkshopList refreshKey={regjistrimWorkshopRefreshKey} onEdit={setSelectedRegjistrimWorkshop} />
-            ) : activeView === 'sales' ? (
-              <ShitjetList refreshKey={saleRefreshKey} onEdit={setSelectedSale} />
-            ) : activeView === 'regjistrime' ? (
-              <RegjistrimetList refreshKey={registrationRefreshKey} />
-            ) : (
-              <PagesatList refreshKey={paymentRefreshKey} />
-            )}
-          </section>
-
-          <aside className="content-panel">
-            {activeView === 'products' ? (
-              <ProduktetForm selected={selectedProduct} onSaved={handleProductSaved} onCancel={() => setSelectedProduct(null)} />
-            ) : activeView === 'sallat' ? (
-              <SallatForm selected={selectedSalla} onSaved={() => { setSelectedSalla(null); setSallaRefreshKey((p) => p + 1); }} onCancel={() => setSelectedSalla(null)} />
-            ) : activeView === 'orari' ? (
-              <OrariForm selected={selectedOrar} onSaved={() => { setSelectedOrar(null); setOrariRefreshKey((p) => p + 1); }} onCancel={() => setSelectedOrar(null)} />
-            ) : activeView === 'workshops' ? (
-              <WorkshopetForm selected={selectedWorkshop} onSaved={handleWorkshopSaved} onCancel={() => setSelectedWorkshop(null)} />
-            ) : activeView === 'regjistrimworkshop' ? (
-              <RegjistrimWorkshopForm selected={selectedRegjistrimWorkshop} onSaved={handleRegjistrimWorkshopSaved} onCancel={() => setSelectedRegjistrimWorkshop(null)} />
-            ) : activeView === 'sales' ? (
-              <ShitjetForm selected={selectedSale} onSaved={handleSaleSaved} onCancel={() => setSelectedSale(null)} />
-            ) : activeView === 'regjistrime' ? (
-              <RegjistrimetForm onSaved={handleRegjistrimSaved} />
-            ) : (
-              <PagesatForm onSaved={handlePagesaSaved} />
-            )}
-          </aside>
-        </div>
+        <Outlet />
       </main>
     </div>
-  )
+  );
+};
+
+const EntityPage = ({ ListComponent, FormComponent, entityName, onSaved }) => {
+  const [refreshKey, setRefreshKey] = React.useState(0);
+  const [selectedItem, setSelectedItem] = React.useState(null);
+
+  const handleSaved = () => {
+    setSelectedItem(null);
+    setRefreshKey((prev) => prev + 1);
+    if (onSaved) onSaved();
+  };
+
+  return (
+    <div className="content-grid">
+      <section className="content-main">
+        <ListComponent 
+          refreshKey={refreshKey} 
+          onEdit={setSelectedItem} 
+        />
+      </section>
+      <aside className="content-panel">
+        {selectedItem ? (
+          <FormComponent 
+            selected={selectedItem} 
+            onSaved={handleSaved} 
+            onCancel={() => setSelectedItem(null)} 
+          />
+        ) : (
+          <div className="empty-state">
+            <h3>Select an item to edit or create a new one</h3>
+            <button 
+              onClick={() => setSelectedItem({})} 
+              className="button button-secondary"
+            >
+              Create New {entityName}
+            </button>
+          </div>
+        )}
+      </aside>
+    </div>
+  );
+};
+
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route 
+            path="/" 
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route 
+                      path="/anetaret" 
+                      element={
+                        <EntityPage 
+                          ListComponent={AnetaretList}
+                          FormComponent={AnetaretForm}
+                          entityName="Anetar"
+                          onSaved={() => {/* Optional callback */}}
+                        />
+                      } 
+                    />
+                    <Route 
+                      path="/instruktoret" 
+                      element={
+                        <EntityPage 
+                          ListComponent={InstruktoretList}
+                          FormComponent={InstruktoretForm}
+                          entityName="Instruktor"
+                          onSaved={() => {/* Optional callback */}}
+                        />
+                      } 
+                    />
+                    <Route 
+                      path="/klasat" 
+                      element={
+                        <EntityPage 
+                          ListComponent={KlasatList}
+                          FormComponent={KlasatForm}
+                          entityName="Klasë"
+                          onSaved={() => {/* Optional callback */}}
+                        />
+                      } 
+                    />
+                    <Route 
+                      path="/anetaresimet" 
+                      element={
+                        <EntityPage 
+                          ListComponent={AnetaresimetList}
+                          FormComponent={AnetaresimetForm}
+                          entityName="Abonim"
+                          onSaved={() => {/* Optional callback */}}
+                        />
+                      } 
+                    />
+                    <Route 
+                      path="/pagesat" 
+                      element={
+                        <EntityPage 
+                          ListComponent={PagesatList}
+                          FormComponent={PagesatForm}
+                          entityName="Pagese"
+                          onSaved={() => {/* Optional callback */}}
+                        />
+                      } 
+                    />
+                    <Route 
+                      path="/orari" 
+                      element={
+                        <EntityPage 
+                          ListComponent={OrariList}
+                          FormComponent={OrariForm}
+                          entityName="Orar"
+                          onSaved={() => {/* Optional callback */}}
+                        />
+                      } 
+                    />
+                    <Route 
+                      path="/produktet" 
+                      element={
+                        <EntityPage 
+                          ListComponent={ProduktetList}
+                          FormComponent={ProduktetForm}
+                          entityName="Produkt"
+                          onSaved={() => {/* Optional callback */}}
+                        />
+                      } 
+                    />
+                    <Route 
+                      path="/regjistrimet" 
+                      element={
+                        <EntityPage 
+                          ListComponent={RegjistrimetList}
+                          FormComponent={RegjistrimetForm}
+                          entityName="Regjistrim"
+                          onSaved={() => {/* Optional callback */}}
+                        />
+                      } 
+                    />
+                    <Route 
+                      path="/regjirimworkshop" 
+                      element={
+                        <EntityPage 
+                          ListComponent={RegjistrimWorkshopList}
+                          FormComponent={RegjistrimWorkshopForm}
+                          entityName="Regjrim Workshop"
+                          onSaved={() => {/* Optional callback */}}
+                        />
+                      } 
+                    />
+                    <Route 
+                      path="/sallat" 
+                      element={
+                        <EntityPage 
+                          ListComponent={SallatList}
+                          FormComponent={SallatForm}
+                          entityName="Sallë"
+                          onSaved={() => {/* Optional callback */}}
+                        />
+                      } 
+                    />
+                    <Route 
+                      path="/shitjet" 
+                      element={
+                        <EntityPage 
+                          ListComponent={ShitjetList}
+                          FormComponent={ShitjetForm}
+                          entityName="Shitje"
+                          onSaved={() => {/* Optional callback */}}
+                        />
+                      } 
+                    />
+                    <Route 
+                      path="/workshopet" 
+                      element={
+                        <EntityPage 
+                          ListComponent={WorkshopetList}
+                          FormComponent={WorkshopetForm}
+                          entityName="Workshop"
+                          onSaved={() => {/* Optional callback */}}
+                        />
+                      } 
+                    />
+                  </Routes>
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;
